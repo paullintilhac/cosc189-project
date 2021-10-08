@@ -34,7 +34,13 @@ def kernel_pca_dr(X_train, X_test, rd,kernel="rbf",X_val=None, rev=None, **kwarg
         X_val_dr = kpca.transform(X_val)
 
     if rev is not None:
-       print("cannot invert kernel pca")
+        X_train_rev = kpca.inverse_transform(X_train_dr)
+        X_test_rev = kpca.inverse_transform(X_test_dr)
+        if X_val is not None:
+            X_val_rev = pca.inverse_transform(X_val_dr)
+            return X_train_rev, X_test_rev, X_val_rev, kpca
+        else:
+            return X_train_rev, X_test_rev, kpca
     else:
         if X_val is not None:
             return X_train_dr, X_test_dr, X_val_dr, kpca
@@ -255,6 +261,7 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
         whiten = true
     if DR == 'kernel-pca':
         dr_func = kernel_pca_dr
+        whiten = false
     elif DR == 'rp':
         dr_func = random_proj_dr
     elif DR == 'dca':
