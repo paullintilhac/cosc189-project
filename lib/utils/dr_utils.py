@@ -4,7 +4,7 @@ reduction technique.
 """
 import numpy as np
 
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, KernelPCA
 from sklearn.random_projection import GaussianRandomProjection as GRP
 
 from lib.utils.data_utils import get_data_shape
@@ -13,6 +13,34 @@ from lib.utils.AntiWhiten import AntiWhiten
 
 #------------------------------------------------------------------------------#
 
+
+def kernel_pca_dr(X_train, X_test, rd,kernel="rbf",X_val=None, rev=None, **kwargs):
+    """
+    Perform kernel PCA on X_train then transform X_train, X_test (and X_val).
+    Return transformed data in original space if rev is True; otherwise, return
+    transformed data in PCA space.
+    """
+
+    whiten = kwargs['whiten']
+    # Fit PCA model on training data, random_state is specified to make sure
+    # result is reproducible
+    kpca = sklearn.decomposition.KernelPCA(n_components=rd, kernel='rbf', gamma=None, fit_inverse_transform=rev, random_state=10)
+    kpca.fit(X_train)
+
+    # Transforming training and test data
+    X_train_dr = kpca.transform(X_train)
+    X_test_dr = kpca.transform(X_test)
+    if X_val is not None:
+        X_val_dr = kpca.transform(X_val)
+
+    if rev is not None:
+       print("cannot invert kernel pca")
+    else:
+        if X_val is not None:
+            return X_train_dr, X_test_dr, X_val_dr, kpca
+        else:
+            return X_train_dr, X_test_dr, kpca
+#------------------------------------------------------------------------------#
 
 def pca_dr(X_train, X_test, rd, X_val=None, rev=None, **kwargs):
     """
@@ -219,12 +247,14 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
     deg = None
 
     # Assign corresponding DR function
-    if 'pca' in DR:
+    if DR == 'pca':
         dr_func = pca_dr
-        if DR == 'pca-whiten':
-            whiten = True
-        else:
-            whiten = False
+        whiten = false
+    if DR == 'pca-whiten':
+        dr_func = pca_dr
+        whiten = true
+    if DR == 'kernel-pca':
+        dr_func = kernel_pca_dr
     elif DR == 'rp':
         dr_func = random_proj_dr
     elif DR == 'dca':
