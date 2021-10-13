@@ -170,27 +170,27 @@ def model_trainer(input_var, target_var, prediction, test_prediction, params,
             inputs, targets = batch
             train_err += train_fn(inputs, targets)
             train_batches += 1
-        if X_val != None:
+        print("xval: " + str(X_val))
+        
         # And a full pass over the validation data:
-            val_err = 0
-            val_acc = 0
-            val_batches = 0
-            for batch in iterate_minibatches(X_val, y_val, batchsize,
-                                             shuffle=False):
-                inputs, targets = batch
-                err, acc = validator(inputs, targets)
-                val_err += err
-                val_acc += acc
-                val_batches += 1
+        val_err = 0
+        val_acc = 0
+        val_batches = 0
+        for batch in iterate_minibatches(X_val, y_val, batchsize,
+                                            shuffle=False):
+            inputs, targets = batch
+            err, acc = validator(inputs, targets)
+            val_err += err
+            val_acc += acc
+            val_batches += 1
 
         # Then we print the results for this epoch:
         print("Epoch {} of {} took {:.3f}s".format(
               epoch + 1, num_epochs, time.time() - start_time))
         print("  training loss:\t\t{:.6f}".format(train_err / train_batches))
-        if X_val != None:
-            print("  validation loss:\t\t{:.6f}".format(val_err / val_batches))
-            print("  validation accuracy:\t\t{:.2f} %".format(
-                  val_acc / val_batches * 100))
+        print("  validation loss:\t\t{:.6f}".format(val_err / val_batches))
+        print("  validation accuracy:\t\t{:.2f} %".format(
+                val_acc / val_batches * 100))
 #------------------------------------------------------------------------------#
 
 #------------------------------------------------------------------------------#
