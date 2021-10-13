@@ -33,12 +33,12 @@ def recons_defense(model_dict, data_dict, input_var, target_var, test_prediction
 
     rev_flag = model_dict['rev']
     dim_red = model_dict['dim_red']
-    X_val = None
+    X_val = np.array(([]))
 
     # Doing dimensionality reduction on dataset
     print("Doing {} with rd={} over the training data".format(dim_red, rd))
-    X_train, X_test, dr_alg = dr_wrapper(X_train, X_test, dim_red, rd,
-                                                X_val, rev_flag)
+    X_train, X_test, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd,
+                                                y_train, rev_flag)
 
     # Evaluating on re-constructed inputs
     test_model_eval(model_dict, input_var, target_var, test_prediction,
