@@ -193,7 +193,7 @@ def attack_wrapper(model_dict, data_dict, input_var, target_var, test_prediction
     : return o_list: list of [acc., conf.] tested on adv. samples
     : return dev_list: list of used epsilons
     """
-
+    print("running attack_wrapper")
     adv_len = data_dict['test_len']
     no_of_dim = data_dict['no_of_dim']
     channels = model_dict['channels']
@@ -233,10 +233,11 @@ def attack_wrapper(model_dict, data_dict, input_var, target_var, test_prediction
     test_loss = loss_fn(test_prediction, target_var)
     test_acc = acc_fn(test_prediction, target_var)
     validator = val_fn(input_var, target_var, test_loss, test_acc)
-
+    print("dev_list: " + str(dev_list))
     o_list = []
     mag_count = 0
     for dev_mag in dev_list:
+        print("dev_mag: " + str(dev_mag))
         adv_x.fill(0)
         start_time = time.time()
         batch_len = 100

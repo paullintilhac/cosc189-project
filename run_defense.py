@@ -28,12 +28,13 @@ def main(argv):
 
     # Parameters
     batchsize = 500                          # Fixing batchsize
-    no_of_mags = 1                          # No. of deviations to consider
-    dev_list = np.linspace(2.5, 2.5, no_of_mags)
+    no_of_mags = 21                         # No. of deviations to consider
+    dev_list = np.linspace(.1, 4, no_of_mags)
 
     # Create model_dict from arguments
     model_dict = model_dict_create()
 
+    # print("model dict: " + str(model_dict))
     # Load and parse specified dataset into numpy arrays
     print('Loading data...')
     dataset = model_dict['dataset']
@@ -62,6 +63,8 @@ def main(argv):
     data_dict, test_prediction, dr_alg, X_test, input_var, target_var = \
         model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val)
 
+    print("dev list")
+    print(dev_list)
     # Running attack and saving samples
     print('Creating adversarial samples...')
     adv_x_ini, output_list = attack_wrapper(model_dict, data_dict, input_var,
@@ -69,6 +72,7 @@ def main(argv):
     print_output(model_dict, output_list, dev_list)
     # save_images(model_dict, data_dict, X_test, adv_x_ini, dev_list)
 
+    print("using defense "+str(model_dict['defense']))
     # Run defense
     defense = model_dict['defense']
     if defense != None:

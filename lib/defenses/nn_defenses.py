@@ -85,7 +85,7 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
     : param X_test: Test data
     : param y_test: Test data labels
     """
-
+    print("running retrain_defense")
     # Parameters
     rev_flag = None
 
@@ -110,7 +110,6 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
         X_adv = reshape_data(X_adv, data_dict, rd)
         output_list.append(acc_calc_all(X_adv, y_test, X_test, i_c,
                                      validator, indexer, predictor, confidence))
-
         print("Final results for {}:".format(dev_list[mag_count]))
         print("  test accuracy:\t\t{:.2f} %".format(100.0-output_list[0][4]))
 
