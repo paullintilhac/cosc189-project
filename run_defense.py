@@ -28,7 +28,7 @@ def main(argv):
 
     # Parameters
     batchsize = 500                          # Fixing batchsize
-    no_of_mags = 21                         # No. of deviations to consider
+    no_of_mags = 5                      # No. of deviations to consider
     dev_list = np.linspace(.1, 4, no_of_mags)
 
     # Create model_dict from arguments

@@ -266,8 +266,8 @@ def attack_wrapper(model_dict, data_dict, input_var, target_var, test_prediction
         o_list.append(acc_calc_all(adv_x, y_test, X_test, i_c, validator,
                                    indexer, predictor, confidence))
 
-        print("Final results for {}:".format(dev_mag))
-        print("  test accuracy:\t\t{:.10f} %".format(100.0-o_list[0][4]))
+        #print("Final results for {}:".format(dev_mag))
+        #print("  test accuracy:\t\t{:.10f} %".format(100.0-o_list[0][4]))
 
 
         # Saving adversarial examples

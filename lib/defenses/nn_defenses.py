@@ -102,7 +102,6 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
     adv_len = len(adv_x_ini)
     dev_len = len(dev_list)
     adv_x = np.zeros((adv_len, rd, dev_len))
-
     output_list = []
     for mag_count in range(dev_len):
         X_adv = dr_alg.transform(adv_x_ini[:,:,mag_count])
@@ -110,8 +109,10 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
         X_adv = reshape_data(X_adv, data_dict, rd)
         output_list.append(acc_calc_all(X_adv, y_test, X_test, i_c,
                                      validator, indexer, predictor, confidence))
-        print("Final results for {}:".format(dev_list[mag_count]))
-        print("  test accuracy:\t\t{:.2f} %".format(100.0-output_list[0][4]))
+        err, acc = validator(X_adv, y_test)
+        print("real test accurcy: " + str(acc))
+        #print("Final results for {}:".format(dev_list[mag_count]))
+        #print("  test accuracy:\t\t{:.2f} %".format(100.0-output_list[0][4]))
 
     # Printing result to file
     is_defense = True
