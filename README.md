@@ -71,5 +71,3 @@ The detail on the defense can be found in the paper. Supported defense mechanism
 Arjan Bhagoji (abhagoji@princeton.edu)  
 Chawin Sitawarin (chawins@princeton.edu)  
 Electrical Engineering Department, Princeton University
-
-This repository is under active development and we welcome contributions.
