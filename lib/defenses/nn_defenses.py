@@ -37,7 +37,7 @@ def recons_defense(model_dict, data_dict, input_var, target_var, test_prediction
 
     # Doing dimensionality reduction on dataset
     print("Doing {} with rd={} over the training data".format(dim_red, rd))
-    X_train, X_test, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd,
+    X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd,
                                                 y_train, rev_flag)
 
     # Evaluating on re-constructed inputs
