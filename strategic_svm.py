@@ -94,7 +94,7 @@ def main(argv):
 
         # Dimension reduce dataset and reshape
         X_train_dr, _, _, dr_alg = dr_wrapper(
-            X_train, X_test, None, DR, rd, y_train, rev=rev_flag)
+            X_train, X_test, np.array(([])), DR, rd, y_train, rev=rev_flag)
 
         # With dimension reduced dataset, create new model or load existing one
         clf = model_creator(model_dict, X_train_dr, y_train, None, rd, rev_flag)
