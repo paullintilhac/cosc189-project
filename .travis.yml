@@ -4,7 +4,7 @@ python:
 
 install:
     - pip install -r requirement.txt
-    - pip2 install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
+    - pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
 script:
     - python run_defense.py --n_epoch=5 -d recons --rev
     - python run_defense.py --n_epoch=5 -d retrain
