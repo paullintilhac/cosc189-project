@@ -65,7 +65,7 @@ def recons_defense(model_dict, data_dict, input_var, target_var, test_prediction
     print_output(model_dict, output_list, dev_list, is_defense=True, rd=rd)
 
     # Saving images
-    save_images(model_dict, data_dict, X_test, adv_x, dev_list, rd, dr_alg)
+    # save_images(model_dict, data_dict, X_test, adv_x, dev_list, rd, dr_alg)
 #------------------------------------------------------------------------------#
 
 #------------------------------------------------------------------------------#
