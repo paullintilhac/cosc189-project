@@ -243,9 +243,10 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
     # Reshape for dimension reduction function
     DR_in_train = X_train.reshape(train_len, no_of_features)
     DR_in_test = X_test.reshape(test_len, no_of_features)
-    if X_val.any():
-        val_len = data_dict['val_len']
-        DR_in_val = X_val.reshape(val_len, no_of_features)
+    if X_val:
+        if X_val.any():
+            val_len = data_dict['val_len']
+            DR_in_val = X_val.reshape(val_len, no_of_features)
     else:
         DR_in_val = None
 
@@ -271,11 +272,12 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
         deg = int(DR.split('antiwhiten', 1)[1])
 
     # Perform DR
-    if X_val.any():
-        X_train, X_test, X_val, dr_alg = dr_func(DR_in_train, DR_in_test, rd,
-                                                 X_val=DR_in_val, rev=rev,
-                                                 y_train=y_train, whiten=whiten,
-                                                 deg=deg)
+    if X_val:
+        if X_val.any():
+            X_train, X_test, X_val, dr_alg = dr_func(DR_in_train, DR_in_test, rd,
+                                                    X_val=DR_in_val, rev=rev,
+                                                    y_train=y_train, whiten=whiten,
+                                                    deg=deg)
     else:
         X_train, X_test, dr_alg = dr_func(DR_in_train, DR_in_test, rd,
                                           X_val=DR_in_val, rev=rev,

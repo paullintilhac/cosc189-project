@@ -38,7 +38,7 @@ def main(argv):
     if model_dict['classes'] != 2:
         for i in range(n_mag):
             X_adv, y_ini = mult_cls_atk(
-                clf, X_test, mean, dev_list[i], img_flag)s
+                clf, X_test, mean, dev_list[i], img_flag)
             output_list.append(acc_calc_all(clf, X_adv, y_test, y_ini))
             X_adv_all[:, :, i] = X_adv
             if img_flag != None:
