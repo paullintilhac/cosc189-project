@@ -295,7 +295,7 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
         width = data_dict['width']
         X_train = X_train.reshape((train_len, channels, height, width))
         X_test = X_test.reshape((test_len, channels, height, width))
-        if X_val is not None:
+        if X_val is not None and len(X_val)>0:
             X_val = X_val.reshape((val_len, channels, height, width))
 
     return X_train, X_test, X_val, dr_alg
