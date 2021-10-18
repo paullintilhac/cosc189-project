@@ -23,7 +23,8 @@ def model_creator(model_dict, data_dict, input_var, target_var, rd=None,
     Create a Lasagne model/network as specified in <model_dict> and check
     whether the model already exists in model folder.
     """
-
+    print("creating model...")
+    print(str(model_dict))
     n_epoch = model_dict['num_epochs']
     dataset = model_dict['dataset']
     model_name = model_dict['model_name']
@@ -117,7 +118,8 @@ def model_loader(model_dict, rd=None):
     """
     Load parameters of the saved Lasagne model
     """
-
+    print("loading model...")
+    #print(str(model_dict))
     mname = get_model_name(model_dict, rd)
     abs_path_m = resolve_path_m(model_dict)
 
@@ -134,7 +136,8 @@ def model_saver(network, model_dict, rd=None):
     """
     Save model parameters in model foler as .npz file compatible with Lasagne
     """
-
+    print("saving model")
+    #print(str(model_dict))
     mname = get_model_name(model_dict, rd)
     abs_path_m = resolve_path_m(model_dict)
 
@@ -149,7 +152,8 @@ def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
     """
     Main function to set up network (create, load, test, save)
     """
-
+    print("setting up model")
+    #print(str(model_dict))
     rev = model_dict['rev']
     dim_red = model_dict['dim_red']
     if rd:

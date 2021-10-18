@@ -20,11 +20,11 @@ def kernel_pca_dr(X_train, X_test, rd,kernel="rbf",X_val=None, rev=None, **kwarg
     Return transformed data in original space if rev is True; otherwise, return
     transformed data in PCA space.
     """
-
+    print("running kernel pca dr")
     whiten = kwargs['whiten']
     # Fit PCA model on training data, random_state is specified to make sure
     # result is reproducible
-    kpca = sklearn.decomposition.KernelPCA(n_components=rd, kernel='rbf', gamma=None, fit_inverse_transform=rev, random_state=10)
+    kpca = KernelPCA(n_components=rd, kernel='rbf', gamma=None, fit_inverse_transform=rev, random_state=10)
     kpca.fit(X_train)
 
     # Transforming training and test data
@@ -54,7 +54,7 @@ def pca_dr(X_train, X_test, rd, X_val=None, rev=None, **kwargs):
     Return transformed data in original space if rev is True; otherwise, return
     transformed data in PCA space.
     """
-
+    print("running pca dr")
     whiten = kwargs['whiten']
     # Fit PCA model on training data, random_state is specified to make sure
     # result is reproducible
@@ -243,7 +243,7 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
     # Reshape for dimension reduction function
     DR_in_train = X_train.reshape(train_len, no_of_features)
     DR_in_test = X_test.reshape(test_len, no_of_features)
-    if X_val:
+    if X_val.any():
         val_len = data_dict['val_len']
         DR_in_val = X_val.reshape(val_len, no_of_features)
     else:
@@ -255,13 +255,13 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
     # Assign corresponding DR function
     if DR == 'pca':
         dr_func = pca_dr
-        whiten = false
+        whiten = False
     if DR == 'pca-whiten':
         dr_func = pca_dr
-        whiten = true
+        whiten = True
     if DR == 'kernel-pca':
         dr_func = kernel_pca_dr
-        whiten = false
+        whiten = False
     elif DR == 'rp':
         dr_func = random_proj_dr
     elif DR == 'dca':
@@ -271,11 +271,11 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
         deg = int(DR.split('antiwhiten', 1)[1])
 
     # Perform DR
-    if X_val:
+    if X_val.any():
         X_train, X_test, X_val, dr_alg = dr_func(DR_in_train, DR_in_test, rd,
-                                                 X_val=DR_in_val, rev=rev,
-                                                 y_train=y_train, whiten=whiten,
-                                                 deg=deg)
+                                                X_val=DR_in_val, rev=rev,
+                                                y_train=y_train, whiten=whiten,
+                                                deg=deg)
     else:
         X_train, X_test, dr_alg = dr_func(DR_in_train, DR_in_test, rd,
                                           X_val=DR_in_val, rev=rev,
@@ -287,7 +287,7 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
         channels = data_dict['channels']
         X_train = X_train.reshape((train_len, channels, rd))
         X_test = X_test.reshape((test_len, channels, rd))
-        if X_val is not None:
+        if X_val is not None and len(X_val)>0:
             X_val = X_val.reshape((val_len, channels, rd))
     elif (no_of_dim == 4) and (rev is not None):
         channels = data_dict['channels']
@@ -295,7 +295,7 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
         width = data_dict['width']
         X_train = X_train.reshape((train_len, channels, height, width))
         X_test = X_test.reshape((test_len, channels, height, width))
-        if X_val is not None:
+        if X_val is not None and len(X_val)>0:
             X_val = X_val.reshape((val_len, channels, height, width))
 
     return X_train, X_test, X_val, dr_alg

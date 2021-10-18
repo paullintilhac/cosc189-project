@@ -51,7 +51,7 @@ for item in list_dim:
     count=count+1
     color = colors[count % len(colors)]
     style = markers[count % len(markers)]
-    path_curr=abs_path_o+'FSG_mod_MNIST_nn_2_100_strategic.txt'
+    path_curr=abs_path_o+'MNIST/fg_nn_FC_2_100.txt'
     curr_array=np.genfromtxt(path_curr,delimiter=',',skip_header=2+52*(count-1),skip_footer=52*(dims-count))
     handle_list.append(plt.plot(curr_array[:,0],curr_array[:,5],linestyle='-', marker=style, color=color, markersize=10,label=item))
 

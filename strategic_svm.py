@@ -38,7 +38,7 @@ def main(argv):
     if model_dict['classes'] != 2:
         for i in range(n_mag):
             X_adv, y_ini = mult_cls_atk(
-                clf, X_test, mean, dev_list[i], img_flag)s
+                clf, X_test, mean, dev_list[i], img_flag)
             output_list.append(acc_calc_all(clf, X_adv, y_test, y_ini))
             X_adv_all[:, :, i] = X_adv
             if img_flag != None:
@@ -94,7 +94,7 @@ def main(argv):
 
         # Dimension reduce dataset and reshape
         X_train_dr, _, _, dr_alg = dr_wrapper(
-            X_train, X_test, None, DR, rd, y_train, rev=rev_flag)
+            X_train, X_test, np.array(([])), DR, rd, y_train, rev=rev_flag)
 
         # With dimension reduced dataset, create new model or load existing one
         clf = model_creator(model_dict, X_train_dr, y_train, None, rd, rev_flag)

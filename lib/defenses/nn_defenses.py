@@ -33,12 +33,12 @@ def recons_defense(model_dict, data_dict, input_var, target_var, test_prediction
 
     rev_flag = model_dict['rev']
     dim_red = model_dict['dim_red']
-    X_val = None
+    X_val = np.array(([]))
 
     # Doing dimensionality reduction on dataset
     print("Doing {} with rd={} over the training data".format(dim_red, rd))
-    X_train, X_test, dr_alg = dr_wrapper(X_train, X_test, dim_red, rd,
-                                                X_val, rev_flag)
+    X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd,
+                                                y_train, rev_flag)
 
     # Evaluating on re-constructed inputs
     test_model_eval(model_dict, input_var, target_var, test_prediction,
@@ -65,7 +65,7 @@ def recons_defense(model_dict, data_dict, input_var, target_var, test_prediction
     print_output(model_dict, output_list, dev_list, is_defense=True, rd=rd)
 
     # Saving images
-    save_images(model_dict, data_dict, X_test, adv_x, dev_list, rd, dr_alg)
+    # save_images(model_dict, data_dict, X_test, adv_x, dev_list, rd, dr_alg)
 #------------------------------------------------------------------------------#
 
 #------------------------------------------------------------------------------#
@@ -85,7 +85,7 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
     : param X_test: Test data
     : param y_test: Test data labels
     """
-
+    print("running retrain_defense")
     # Parameters
     rev_flag = None
 
@@ -102,7 +102,6 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
     adv_len = len(adv_x_ini)
     dev_len = len(dev_list)
     adv_x = np.zeros((adv_len, rd, dev_len))
-
     output_list = []
     for mag_count in range(dev_len):
         X_adv = dr_alg.transform(adv_x_ini[:,:,mag_count])
@@ -110,9 +109,10 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
         X_adv = reshape_data(X_adv, data_dict, rd)
         output_list.append(acc_calc_all(X_adv, y_test, X_test, i_c,
                                      validator, indexer, predictor, confidence))
-
-        print("Final results for {}:".format(dev_list[mag_count]))
-        print("  test accuracy:\t\t{:.2f} %".format(100.0-output_list[0][4]))
+        err, acc = validator(X_adv, y_test)
+        print("real test accurcy: " + str(acc))
+        #print("Final results for {}:".format(dev_list[mag_count]))
+        #print("  test accuracy:\t\t{:.2f} %".format(100.0-output_list[0][4]))
 
     # Printing result to file
     is_defense = True
