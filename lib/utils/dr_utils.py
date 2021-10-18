@@ -24,7 +24,7 @@ def kernel_pca_dr(X_train, X_test, rd,kernel="rbf",X_val=None, rev=None, **kwarg
     whiten = kwargs['whiten']
     # Fit PCA model on training data, random_state is specified to make sure
     # result is reproducible
-    kpca = sklearn.decomposition.KernelPCA(n_components=rd, kernel='rbf', gamma=None, fit_inverse_transform=rev, random_state=10)
+    kpca = KernelPCA(n_components=rd, kernel='rbf', gamma=None, fit_inverse_transform=rev, random_state=10)
     kpca.fit(X_train)
 
     # Transforming training and test data

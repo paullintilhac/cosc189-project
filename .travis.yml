@@ -8,6 +8,7 @@ install:
 script:
     - python run_defense.py --n_epoch=5 -d recons --rev
     - python run_defense.py --n_epoch=5 -d retrain
+    - python run_defense.py --n_epoch=5 -d retrain -dr kernel-pca
 
 
 # after_success:
