@@ -3,7 +3,7 @@ import numpy as py
 import multiprocessing
 
 def reg_param(C):
-    print "Running attack for C={}".format(C)
+    print("Running attack for C={}".format(C))
     subprocess.call(["python strategic_svm.py -C {}".format(C)], shell = True)
     # subprocess.call(["gnuplot -e \"mname='svm_linear_cls6_l2_C{}_strat_pca'\" gnu_in_loop.plg".format(C)], shell=True)
 

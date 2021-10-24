@@ -3,12 +3,18 @@ python:
     - 2.7
 
 install:
-    - pip install -r requirement.txt
-    - pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
+    - pip3 install scipy
+    - pip3 install numpy
+    - pip3 install scikit-learn
+    - pip3 install matplotlib
+    - pip3 install Theano
+    - pip3 install Lasagne
+    - pip3 install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
+    - pip3 install --upgrade https://github.com/Theano/Theano/archive/master.zip
 script:
-    - python run_defense.py --n_epoch=5 -d recons --rev
-    - python run_defense.py --n_epoch=5 -d retrain
-    - python strategic_svm.py
+    - python3 run_defense.py --n_epoch=5 -d recons --rev
+    - python3 run_defense.py --n_epoch=5 -d retrain
+    - python3 strategic_svm.py
     #- python run_defense.py --n_epoch=5 -d retrain -dr kernel-pca
 
 
