@@ -47,7 +47,7 @@ dims=len(list_dim)
 #for item in glob.glob(abs_path_o+'Gradient_attack_SVM_PCA_clean_*.txt'):
 count=0
 for item in list_dim:
-    print item
+    print(item)
     count=count+1
     color = colors[count % len(colors)]
     style = markers[count % len(markers)]

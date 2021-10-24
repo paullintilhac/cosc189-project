@@ -303,7 +303,7 @@ def l_bfgs_attack(input_var, target_var, test_prediction, X_test, y_test,
     y_used = []
     o_list = []
     for i in range(trial_size):
-        print i
+        print(i)
 
         def f(x):
             loss_curr, acc_curr = validator(X_curr +
@@ -358,8 +358,8 @@ def l_bfgs_attack(input_var, target_var, test_prediction, X_test, y_test,
                    count_correct, count_wrong / count_correct * 100])
     # print o_list
     # print deviation_list
-    print deviation / count_wrong
-    print magnitude / count_correct
-    print count_wrong / count_correct
-    print count_correct
+    print(deviation / count_wrong)
+    print(magnitude / count_correct)
+    print(count_wrong / count_correct)
+    print(count_correct)
     return adv_x, o_list, deviation_list

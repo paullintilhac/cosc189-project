@@ -90,7 +90,7 @@ def main():
         X_train_dr, X_test_dr, dr_alg = dr_wrapper(
             X_train_flat, X_test_flat, DR, rd, y_train, rev=rev_flag)
 
-        print X_test_dr.shape
+        print(X_test_dr.shape)
 
         # With dimension reduced dataset, create new model or load existing one
         clf = model_creator(model_dict, X_train_dr, y_train, adv, rd, rev_flag)
@@ -110,7 +110,7 @@ def main():
         var_list = list(var_array)
         coef_norm_dr = np.linalg.norm(clf.coef_[0,:]-clf.coef_[1,:])
         coef_list_dr = list(abs(clf.coef_[0,:]-clf.coef_[1,:]))
-        print np.max(coef_list_dr)
+        print(np.max(coef_list_dr))
         coef_var_list.append(zip(var_list, coef_list_dr))
 
     mag_var_scatter(model_dict, coef_var_list, len(rd_list), rd, rev_flag)
