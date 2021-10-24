@@ -2,7 +2,7 @@ import numpy as np
 import argparse
 import subprocess
 import os
-from sklearn.externals import joblib
+import joblib
 
 from lib.utils.svm_utils import *
 from lib.utils.dr_utils import *
