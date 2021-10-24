@@ -6,7 +6,7 @@ import numpy as np
 from os.path import dirname
 from sklearn import svm
 from sklearn import linear_model
-from sklearn.externals import joblib
+import joblib
 from matplotlib import image as img
 
 from lib.utils.dr_utils import invert_dr, gradient_transform
