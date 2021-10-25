@@ -27,8 +27,8 @@ def main(argv):
     """
 
     # Parameters
-    batchsize = 500                          # Fixing batchsize
-    no_of_mags = 5                      # No. of deviations to consider
+    batchsize = 500                         # Fixing batchsize
+    no_of_mags = 2                     # No. of deviations to consider
     dev_list = np.linspace(.1, 4, no_of_mags)
 
     # Create model_dict from arguments
@@ -42,7 +42,7 @@ def main(argv):
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(
             model_dict)
         # rd_list = [784, 331, 200, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
-        rd_list = [2]
+        rd_list = [model_dict["num_dims"]]
     elif dataset == 'GTSRB':
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(
             model_dict)

@@ -14,17 +14,18 @@ from lib.utils.AntiWhiten import AntiWhiten
 #------------------------------------------------------------------------------#
 
 
-def kernel_pca_dr(X_train, X_test, rd,kernel="rbf",X_val=None, rev=None, **kwargs):
+def kernel_pca_dr(X_train, X_test, rd,kernel="linear",gamma=None,X_val=None, rev=None, **kwargs):
     """
     Perform kernel PCA on X_train then transform X_train, X_test (and X_val).
     Return transformed data in original space if rev is True; otherwise, return
     transformed data in PCA space.
     """
-    print("running kernel pca dr")
+    print("running kernel pca dr with kernel " + kernel)
     whiten = kwargs['whiten']
     # Fit PCA model on training data, random_state is specified to make sure
     # result is reproducible
-    kpca = KernelPCA(n_components=rd, kernel='rbf', gamma=None, fit_inverse_transform=rev, random_state=10)
+    kpca = KernelPCA(n_components=rd, kernel=kernel, gamma=gamma, random_state=10)
+    print("kpca: " + str(kpca))
     kpca.fit(X_train)
 
     # Transforming training and test data
@@ -59,6 +60,8 @@ def pca_dr(X_train, X_test, rd, X_val=None, rev=None, **kwargs):
     # Fit PCA model on training data, random_state is specified to make sure
     # result is reproducible
     pca = PCA(n_components=rd, whiten=whiten, random_state=10)
+    print("pca: " + str(pca))
+
     pca.fit(X_train)
 
     # Transforming training and test data
@@ -228,7 +231,7 @@ def gradient_transform(model_dict, dr_alg):
 #------------------------------------------------------------------------------#
 
 
-def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
+def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None,small=None,gamma=None,kernel='linear'):
     """
     A wrapper function for dimensionality reduction functions.
     """
@@ -275,12 +278,12 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None):
         X_train, X_test, X_val, dr_alg = dr_func(DR_in_train, DR_in_test, rd,
                                                 X_val=DR_in_val, rev=rev,
                                                 y_train=y_train, whiten=whiten,
-                                                deg=deg)
+                                                deg=deg,small=small,gamma=gamma,kernel=kernel)
     else:
         X_train, X_test, dr_alg = dr_func(DR_in_train, DR_in_test, rd,
                                           X_val=DR_in_val, rev=rev,
                                           y_train=y_train, whiten=whiten,
-                                          deg=deg)
+                                          deg=deg,small=small,gamma=gamma,kernel=kernel)
 
     # Reshape DR data to appropriate shape (original shape if rev)
     if (no_of_dim == 3) or ((no_of_dim == 4) and (rev is None)):

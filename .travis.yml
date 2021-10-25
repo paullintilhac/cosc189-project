@@ -9,6 +9,7 @@ install:
     - pip3 install matplotlib
     - pip3 install Theano
     - pip3 install Lasagne
+    - pip3 install pillow
     - pip3 install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
     - pip3 install --upgrade https://github.com/Theano/Theano/archive/master.zip
 script:

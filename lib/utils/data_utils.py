@@ -52,7 +52,14 @@ def model_dict_create():
                         covariance (>= -1)')
     parser.add_argument('-nl', '--nonlin', default='sigmoid', type=str,
                         help='Specify activaton function to use')
-
+    parser.add_argument('-g', '--gamma', default=None, type=float,
+                        help='Specify gamma value for rbf')
+    parser.add_argument('-nd', '--num_dims', default=10, type=int,
+                        help='Specify number of reduced dimensions for mnist')
+    parser.add_argument('-k', '--kernel', default='linear', type=str,
+                        help='Specify activaton function to use')
+    parser.add_argument('--small', action='store_true',
+                        help='use only 1/10th of the mnist data')
     args = parser.parse_args()
 
     model_dict = {}
@@ -69,10 +76,17 @@ def model_dict_create():
     model_dict.update({'batchsize': args.batchsize})
     model_dict.update({'preprocess': args.preprocess})
     model_dict.update({'nonlin': args.nonlin})
+    model_dict.update({'gamma': args.gamma})
+    model_dict.update({'num_dims': args.num_dims})
+    model_dict.update({'kernel': args.kernel})
     if args.rev:
         model_dict.update({'rev': 1})
     else:
         model_dict.update({'rev': None})
+    if args.small:
+        model_dict.update({'small': 1})
+    else:
+        model_dict.update({'small': None})
 
     # Determine output size
     dataset = model_dict['dataset']
@@ -99,6 +113,9 @@ def get_model_name(model_dict, rd = None):
     width = model_dict['width']
     DR = model_dict['dim_red']
     rev = model_dict['rev']
+    small = model_dict['small']
+    gamma = model_dict['gamma']
+    kernel = model_dict['kernel']
 
     if model_name == 'mlp' or model_name == 'custom':
         m_name = 'nn_FC_{}_{}'.format(depth, width)
@@ -116,9 +133,14 @@ def get_model_name(model_dict, rd = None):
             m_name += '_rev'
     if reg is not None:
         m_name += '_reg_{}'.format(reg)
+    if gamma is not None:
+        m_name += '_g_{}'.format(gamma)
+    if small is not None:
+        m_name += '_{}_'.format(small)
     if model_name == 'custom':
         m_name += '_drop'
-
+    if kernel is not None:
+        m_name += '_{}_'.format(kernel)
     return m_name
 #------------------------------------------------------------------------------#
 
@@ -128,7 +150,7 @@ def load_dataset_MNIST(model_dict):
     Load MNIST data as a (datasize) x 1 x (height) x (width) numpy matrix.
     Each pixel is rescaled to lie in [0,1].
     """
-
+    small_flag = model_dict['small']
     # We first define a download function, supporting both Python 2 and 3.
     if sys.version_info[0] == 2:
         from urllib import urlretrieve
@@ -173,21 +195,26 @@ def load_dataset_MNIST(model_dict):
     y_train = load_mnist_labels(abs_path_i, 'train-labels-idx1-ubyte.gz')
     X_test = load_mnist_images(abs_path_i, 't10k-images-idx3-ubyte.gz')
     y_test = load_mnist_labels(abs_path_i, 't10k-labels-idx1-ubyte.gz')
+    print("X_train: " + str(X_train.shape) + ", y_train: " + str(y_train.shape) + ", X_test: " + str(X_test.shape) + ", y_test: " + str(y_test.shape))
+    if small_flag:
+        TRUNCATION = 5000
+        X_train = X_train[:TRUNCATION]
+        X_test = X_test[:TRUNCATION]
+        y_train = y_train[:TRUNCATION]
+        y_test = y_test[:TRUNCATION]
+        X_train, X_val = X_train[:-1000], X_train[-1000:]
+        y_train, y_val = y_train[:-1000], y_train[-1000:]
+    else:
+        # We reserve the last 10000 training examples for validation. 
+        X_train, X_val = X_train[:-10000], X_train[-10000:]
+        y_train, y_val = y_train[:-10000], y_train[-10000:]
+    #
+    print("after: X_train: " + str(X_train.shape) + ", y_train: " + str(y_train.shape) + ", X_test: " + str(X_test.shape) + ", y_test: " + str(y_test.shape))
 
-    # We reserve the last 10000 training examples for validation.
-    X_train, X_val = X_train[:-10000], X_train[-10000:]
-    y_train, y_val = y_train[:-10000], y_train[-10000:]
     print("LOADING MNIST LABELS")
-    TRUNCATION = 1000
-    X_train = X_train[:TRUNCATION]
-    X_test = X_test[:TRUNCATION]
-    X_val = X_val[:TRUNCATION]
-    y_train = y_train[:TRUNCATION]
-    y_test = y_test[:TRUNCATION]
-    y_val = y_val[:TRUNCATION]
+    
 
 
-    print("X_train: " + str(X_train.shape) + ",  X_val: " +  str(X_val.shape)+ ", y_train: " + str(y_train.shape) + ", y_val: " + str(y_val.shape) + ", X_test: " + str(X_test.shape) + ", y_test: " + str(y_test.shape))
     # We just return all the arrays in order, as expected in main().
     # (It doesn't matter how we do this as long as we can read them again.)
     return X_train, y_train, X_val, y_val, X_test, y_test
