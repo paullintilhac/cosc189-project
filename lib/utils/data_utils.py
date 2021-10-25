@@ -177,7 +177,17 @@ def load_dataset_MNIST(model_dict):
     # We reserve the last 10000 training examples for validation.
     X_train, X_val = X_train[:-10000], X_train[-10000:]
     y_train, y_val = y_train[:-10000], y_train[-10000:]
+    print("LOADING MNIST LABELS")
+    TRUNCATION = 1000
+    X_train = X_train[:TRUNCATION]
+    X_test = X_test[:TRUNCATION]
+    X_val = X_val[:TRUNCATION]
+    y_train = y_train[:TRUNCATION]
+    y_test = y_test[:TRUNCATION]
+    y_val = y_val[:TRUNCATION]
 
+
+    print("X_train: " + str(X_train.shape) + ",  X_val: " +  str(X_val.shape)+ ", y_train: " + str(y_train.shape) + ", y_val: " + str(y_val.shape) + ", X_test: " + str(X_test.shape) + ", y_test: " + str(y_test.shape))
     # We just return all the arrays in order, as expected in main().
     # (It doesn't matter how we do this as long as we can read them again.)
     return X_train, y_train, X_val, y_val, X_test, y_test

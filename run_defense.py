@@ -42,7 +42,7 @@ def main(argv):
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(
             model_dict)
         # rd_list = [784, 331, 200, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
-        rd_list = [100]
+        rd_list = [2]
     elif dataset == 'GTSRB':
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(
             model_dict)
