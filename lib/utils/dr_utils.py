@@ -24,7 +24,7 @@ def kernel_pca_dr(X_train, X_test, rd,kernel="linear",gamma=None,X_val=None, rev
     whiten = kwargs['whiten']
     # Fit PCA model on training data, random_state is specified to make sure
     # result is reproducible
-    kpca = KernelPCA(n_components=rd, kernel=kernel, gamma=gamma, random_state=10)
+    kpca = KernelPCA(n_components=rd, fit_inverse_transform=rev,kernel=kernel, gamma=gamma, random_state=10)
     print("kpca: " + str(kpca))
     kpca.fit(X_train)
 
@@ -181,7 +181,7 @@ def invert_dr(X, dr_alg, DR):
     Inverse transform data <X> in reduced dimension back to its full dimension
     """
 
-    inv_list = ['pca', 'pca-whiten', 'dca']
+    inv_list = ['pca', 'pca-whiten', 'dca','kernel-pca']
 
     if (DR in inv_list) or ('antiwhiten' in DR):
         X_rev = dr_alg.inverse_transform(X)

@@ -169,7 +169,6 @@ def model_trainer(input_var, target_var, prediction, test_prediction, params,
             inputs, targets = batch
             train_err += train_fn(inputs, targets)
             train_batches += 1
-        print("batch size: " + str(batchsize))
         if X_val is not None:
             # And a full pass over the validation data:
             val_err = 0
@@ -182,7 +181,6 @@ def model_trainer(input_var, target_var, prediction, test_prediction, params,
                 val_err += err
                 val_acc += acc
                 val_batches += 1
-        print("val batches:  " + str(val_batches))
         # Then we print the results for this epoch:
         print("Epoch {} of {} took {:.3f}s".format(
               epoch + 1, num_epochs, time.time() - start_time))
