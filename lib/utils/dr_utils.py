@@ -38,7 +38,7 @@ def kernel_pca_dr(X_train, X_test, rd,kernel="linear",gamma=None,X_val=None, rev
         X_train_rev = kpca.inverse_transform(X_train_dr)
         X_test_rev = kpca.inverse_transform(X_test_dr)
         if X_val is not None:
-            X_val_rev = pca.inverse_transform(X_val_dr)
+            X_val_rev = kpca.inverse_transform(X_val_dr)
             return X_train_rev, X_test_rev, X_val_rev, kpca
         else:
             return X_train_rev, X_test_rev, kpca
