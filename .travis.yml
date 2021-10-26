@@ -15,8 +15,8 @@ install:
 script:
     - python3 run_defense.py --n_epoch=100 -d recons --rev --small
     - python3 run_defense.py --n_epoch=100 -d retrain --small
-    - python3 strategic_svm.py
-    - python3 run_defense.py --n_epoch=1000 -d retrain -dr kernel-pca -nd 100 --small -k rbf -g .03
+    - python3 strategic_svm.py --small
+    - python3 run_defense.py --n_epoch=1000 -d retrain -dr kernel-pca -nd 100 --small -k rbf -g .035
 
 
 
