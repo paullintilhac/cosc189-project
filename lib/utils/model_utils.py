@@ -156,11 +156,15 @@ def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
     #print(str(model_dict))
     rev = model_dict['rev']
     dim_red = model_dict['dim_red']
+    small = model_dict['small']
+    gamma = model_dict['gamma']
+    kernel = model_dict['kernel']
+
     if rd:
         # Doing dimensionality reduction on dataset
         print("Doing {} with rd={} over the training data".format(dim_red, rd))
         X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val,
-                                                    dim_red, rd, y_train, rev)
+                                                    dim_red, rd, y_train, rev,small, gamma, kernel)
     else:
         dr_alg = None
 

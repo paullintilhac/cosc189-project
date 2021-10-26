@@ -151,6 +151,8 @@ def svm_model_dict_create():
         type=str,
         help='Specify preprocessing on dataset (std, whiten, antiwhiten(*)) \
              (default: None) \n (*) is degree of covariance (>= -1)')
+    parser.add_argument('--small', action='store_true',
+        help='use only 1/10th of the mnist data')
 
     args = parser.parse_args()
 
@@ -167,6 +169,10 @@ def svm_model_dict_create():
         model_dict.update({'rev': 1})
     else:
         model_dict.update({'rev': None})
+    if args.small:
+        model_dict.update({'small': 1})
+    else:
+        model_dict.update({'small': None})
     if args.two_classes:
         model_dict.update({'classes': 2})
     else:
@@ -187,7 +193,7 @@ def get_svm_model_name(model_dict, adv=None, adv_mag=None, rd=None, rev=None):
     """
     Helper function to get model name from <model_dict>, <rd> and <rev>
     """
-
+    
     model_name = 'svm_{}_cls{}'.format(
         model_dict['svm_type'], model_dict['classes'])
 
