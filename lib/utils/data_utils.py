@@ -136,7 +136,7 @@ def get_model_name(model_dict, rd = None):
     if gamma is not None:
         m_name += '_g_{}'.format(gamma)
     if small is not None:
-        m_name += '_{}_'.format(small)
+        m_name += '_small'
     if model_name == 'custom':
         m_name += '_drop'
     if kernel is not None:
@@ -150,7 +150,6 @@ def load_dataset_MNIST(model_dict):
     Load MNIST data as a (datasize) x 1 x (height) x (width) numpy matrix.
     Each pixel is rescaled to lie in [0,1].
     """
-    small_flag = model_dict['small']
     # We first define a download function, supporting both Python 2 and 3.
     if sys.version_info[0] == 2:
         from urllib import urlretrieve
@@ -196,7 +195,7 @@ def load_dataset_MNIST(model_dict):
     X_test = load_mnist_images(abs_path_i, 't10k-images-idx3-ubyte.gz')
     y_test = load_mnist_labels(abs_path_i, 't10k-labels-idx1-ubyte.gz')
     print("X_train: " + str(X_train.shape) + ", y_train: " + str(y_train.shape) + ", X_test: " + str(X_test.shape) + ", y_test: " + str(y_test.shape))
-    if small_flag:
+    if model_dict['small']:
         TRUNCATION = 5000
         X_train = X_train[:TRUNCATION]
         X_test = X_test[:TRUNCATION]
