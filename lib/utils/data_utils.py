@@ -56,7 +56,7 @@ def model_dict_create():
                         help='Specify gamma value for rbf')
     parser.add_argument('-nd', '--num_dims', default=10, type=int,
                         help='Specify number of reduced dimensions for mnist')
-    parser.add_argument('-k', '--kernel', default='linear', type=str,
+    parser.add_argument('-k', '--kernel', default=None, type=str,
                         help='Specify activaton function to use')
     parser.add_argument('--small', action='store_true',
                         help='use only 1/10th of the mnist data')
@@ -141,6 +141,7 @@ def get_model_name(model_dict, rd = None):
         m_name += '_drop'
     if kernel is not None:
         m_name += '_{}_'.format(kernel)
+    print("getting model name: " + m_name)
     return m_name
 #------------------------------------------------------------------------------#
 
