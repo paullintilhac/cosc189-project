@@ -54,7 +54,7 @@ def model_dict_create():
                         help='Specify activaton function to use')
     parser.add_argument('-g', '--gamma', default=None, type=float,
                         help='Specify gamma value for rbf')
-    parser.add_argument('-nd', '--num_dims', default=10, type=int,
+    parser.add_argument('-nd', '--num_dims', default=100, type=int,
                         help='Specify number of reduced dimensions for mnist')
     parser.add_argument('-k', '--kernel', default=None, type=str,
                         help='Specify activaton function to use')
