@@ -58,7 +58,10 @@ def model_creator(model_dict, data_dict, input_var, target_var, rd=None,
         activation = model_dict['nonlin']
         model_dict.update({'num_epochs': num_epochs, 'rate': rate,
                            'depth': depth, 'width': width})
-        network = build_cnn_A(in_shape, n_out, input_var)
+        if rd is not None:
+          network = build_cnn_rd(input_var, rd)
+        else:
+          network = build_cnn(in_shape, n_out, input_var)
 
     #------------------------------- MLP model --------------------------------#
     elif model_name == 'mlp':

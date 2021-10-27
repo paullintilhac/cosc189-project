@@ -267,3 +267,47 @@ def build_cnn_rd(input_var, rd):
 
     return network
 #------------------------------------------------------------------------------#
+
+#------------------------------------------------------------------------------#
+# Function to create a CNN according to the specification in Papernot et. al.
+# (2016). This CNN has two convolution + pooling stages and two fully-connected
+# hidden layers in front of the output layer.
+def build_cnn(in_shape, n_out, input_var=None):
+    # Input layer, as usual:
+    network = lasagne.layers.InputLayer(shape=in_shape, input_var=input_var)
+
+    # 2 Convolutional layers with 32 kernels of size 5x5.
+    network = lasagne.layers.Conv2DLayer(
+            network, num_filters=32, filter_size=(5, 5),
+            nonlinearity=lasagne.nonlinearities.rectify,
+            W=lasagne.init.GlorotUniform())
+    network = lasagne.layers.Conv2DLayer(
+            network, num_filters=32, filter_size=(5, 5),
+            nonlinearity=lasagne.nonlinearities.rectify,
+            W=lasagne.init.GlorotUniform())
+
+    # Max-pooling layer of factor 2 in both dimensions:
+    network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
+
+    # Another convolution with 64 5x5 kernels, and another 2x2 pooling:
+    network = lasagne.layers.Conv2DLayer(
+              network, num_filters=64, filter_size=(5, 5),
+              nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.Conv2DLayer(
+              network, num_filters=64, filter_size=(5, 5),
+              nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
+
+    # Two fully-connected layers of 200 units:
+    network = lasagne.layers.DenseLayer(network, num_units=200,
+              nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.DenseLayer(network, num_units=200,
+              nonlinearity=lasagne.nonlinearities.rectify)
+
+    # The 10-unit output layer:
+    network = lasagne.layers.DenseLayer(network, num_units=n_out,
+              nonlinearity=lasagne.nonlinearities.softmax)
+
+    return network
+#------------------------------------------------------------------------------#
+

@@ -20,12 +20,14 @@ def kernel_pca_dr(X_train, X_test, rd,kernel="linear",gamma=None,X_val=None, rev
     Return transformed data in original space if rev is True; otherwise, return
     transformed data in PCA space.
     """
+
     print("running kernel pca dr with kernel " + kernel)
     whiten = kwargs['whiten']
     # Fit PCA model on training data, random_state is specified to make sure
     # result is reproducible
     kpca = KernelPCA(n_components=rd, fit_inverse_transform=rev,kernel=kernel, gamma=gamma, random_state=10)
     print("kpca: " + str(kpca))
+
     kpca.fit(X_train)
 
     # Transforming training and test data
@@ -278,6 +280,7 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None,small=None,gamm
         X_train, X_test, X_val, dr_alg = dr_func(DR_in_train, DR_in_test, rd,
                                                 X_val=DR_in_val, rev=rev,
                                                 y_train=y_train, whiten=whiten,
+
                                                 deg=deg,small=small,gamma=gamma,kernel=kernel)
     else:
         X_train, X_test, dr_alg = dr_func(DR_in_train, DR_in_test, rd,

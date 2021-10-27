@@ -27,6 +27,7 @@ def main(argv):
     """
 
     # Parameters
+
     batchsize = 500                         # Fixing batchsize
     no_of_mags = 2                     # No. of deviations to consider
     dev_list = np.linspace(.1, 4, no_of_mags)

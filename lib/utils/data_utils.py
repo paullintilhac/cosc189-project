@@ -35,7 +35,7 @@ def model_dict_create():
                         help='Specify number of epochs for training')
     parser.add_argument('-a', '--attack', default='fg', type=str,
                         help='Specify method to create adversarial samples')
-    parser.add_argument('-d', '--defense', default=None, type=str,
+    parser.add_argument('-d', '--defense', default='recons', type=str,
                         help='Specify defense mechanism')
     parser.add_argument('-dr', '--dim_red', default='pca', type=str,
                         help='Specify dimension reduction scheme')
@@ -54,9 +54,9 @@ def model_dict_create():
                         help='Specify activaton function to use')
     parser.add_argument('-g', '--gamma', default=None, type=float,
                         help='Specify gamma value for rbf')
-    parser.add_argument('-nd', '--num_dims', default=10, type=int,
+    parser.add_argument('-nd', '--num_dims', default=100, type=int,
                         help='Specify number of reduced dimensions for mnist')
-    parser.add_argument('-k', '--kernel', default='linear', type=str,
+    parser.add_argument('-k', '--kernel', default=None, type=str,
                         help='Specify activaton function to use')
     parser.add_argument('--small', action='store_true',
                         help='use only 1/10th of the mnist data')
@@ -141,6 +141,7 @@ def get_model_name(model_dict, rd = None):
         m_name += '_drop'
     if kernel is not None:
         m_name += '_{}_'.format(kernel)
+    print("getting model name: " + m_name)
     return m_name
 #------------------------------------------------------------------------------#
 
