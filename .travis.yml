@@ -14,11 +14,14 @@ install:
     - pip3 install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
     - pip3 install --upgrade https://github.com/Theano/Theano/archive/master.zip
 script:
-    - python3 run_defense.py --n_epoch=100 -d recons --rev --small
-    - python3 run_defense.py --n_epoch=100 -d retrain --small
+    - python3 run_defense.py --n_epoch=10 -d recons --rev --small
+    - python3 run_defense.py --n_epoch=10 -d retrain --small
     - python3 strategic_svm.py --small
-    - python3 run_defense.py --n_epoch=1000 -d retrain -dr kernel-pca -nd 100 --small -k rbf -g .035
-
+    - python3 run_defense.py --n_epoch=100 -d retrain -dr kernel-pca -nd 100 -k rbf -g .035 --small
+    - python3 run_defense.py -m cnn --n_epoch=10 -d recons --rev --small 
+    # - python3 run_defense.py -m cnn --n_epoch=2 -d retrain 
+    # this last command for the cnn, retrain defense doesn't work with --small
+    # for some reason. so for now, setting n_epoch=2 to compensate for long runtime
 
 
 
