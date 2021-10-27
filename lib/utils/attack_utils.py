@@ -53,7 +53,7 @@ def naive_untargeted_attack(X, y):
     """
 
     scales = length_scales(X, y)
-    print scales
+    print(scales)
     data_len = len(X)
     classes = np.unique(y)
     distances = []
@@ -68,7 +68,7 @@ def naive_untargeted_attack(X, y):
                 if y[i] != y[j]:
                     data_diff = curr_data - X[j, :]
                     data_dist = np.linalg.norm(data_diff)
-                    print data_dist
+                    print(data_dist)
                     curr_distances.append(data_dist/scales[y[i]])
         distances.append(min(curr_distances))
     return distances

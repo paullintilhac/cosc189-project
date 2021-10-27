@@ -108,20 +108,20 @@ def build_cnn_A(in_shape, n_out, input_var=None):
 
     # Input layer, as usual:
     network = lasagne.layers.InputLayer(shape=in_shape, input_var=input_var)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
 
     # 2 Convolutional layers with 32 kernels of size 5x5.
     network = lasagne.layers.Conv2DLayer(
         network, num_filters=64, filter_size=(5, 5), stride=(1,1), pad = "same"
         ,nonlinearity=lasagne.nonlinearities.rectify)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
     network = lasagne.layers.Conv2DLayer(
         network, num_filters=64, filter_size=(5, 5), stride=(1,1), pad = "valid"
         ,nonlinearity=lasagne.nonlinearities.rectify)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
 
     # Max-pooling layer of factor 2 in both dimensions:
     # network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
@@ -137,24 +137,24 @@ def build_cnn_A(in_shape, n_out, input_var=None):
 
     # Two fully-connected layers of 200 units:
     network = lasagne.layers.dropout(network, p=0.25)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
     network = lasagne.layers.DenseLayer(network, num_units=128,
                                     nonlinearity=lasagne.nonlinearities.rectify)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
     # network = lasagne.layers.DenseLayer(network, num_units=200,
     #                                 nonlinearity=lasagne.nonlinearities.rectify)
 
     # The 10-unit output layer:
     network = lasagne.layers.dropout(network,p=0.5)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
     # network = lasagne.layers.FlattenLayer(network)
     network = lasagne.layers.DenseLayer(network, num_units=n_out,
                                     nonlinearity=lasagne.nonlinearities.softmax)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
 
     return network
 #------------------------------------------------------------------------------#
@@ -169,21 +169,21 @@ def build_cnn_B(in_shape, n_out, input_var=None):
 
     # Input layer, as usual:
     network = lasagne.layers.InputLayer(shape=in_shape, input_var=input_var)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
 
     # 2 Convolutional layers with 32 kernels of size 5x5.
     network
     network = lasagne.layers.Conv2DLayer(
         network, num_filters=64, filter_size=(5, 5), stride=(1,1), pad = "same"
         ,nonlinearity=lasagne.nonlinearities.rectify)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
     network = lasagne.layers.Conv2DLayer(
         network, num_filters=64, filter_size=(5, 5), stride=(1,1), pad = "valid"
         ,nonlinearity=lasagne.nonlinearities.rectify)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
 
     # Max-pooling layer of factor 2 in both dimensions:
     # network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
@@ -199,24 +199,24 @@ def build_cnn_B(in_shape, n_out, input_var=None):
 
     # Two fully-connected layers of 200 units:
     network = lasagne.layers.dropout(network, p=0.25)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
     network = lasagne.layers.DenseLayer(network, num_units=128,
                                     nonlinearity=lasagne.nonlinearities.rectify)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
     # network = lasagne.layers.DenseLayer(network, num_units=200,
     #                                 nonlinearity=lasagne.nonlinearities.rectify)
 
     # The 10-unit output layer:
     network = lasagne.layers.dropout(network,p=0.5)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
     # network = lasagne.layers.FlattenLayer(network)
     network = lasagne.layers.DenseLayer(network, num_units=n_out,
                                     nonlinearity=lasagne.nonlinearities.softmax)
-    print lasagne.layers.get_output_shape(network)
-    print lasagne.layers.count_params(network)
+    print(lasagne.layers.get_output_shape(network))
+    print(lasagne.layers.count_params(network))
 
     return network
 #------------------------------------------------------------------------------#
