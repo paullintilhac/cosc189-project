@@ -9,6 +9,8 @@ script:
     - python run_defense.py --n_epoch=5 -d recons --rev
     - python run_defense.py --n_epoch=5 -d retrain
     - python strategic_svm.py
+    - run_defense.py -m cnn -d recons --rev
+    - run_defense.py -m cnn --n_epoch=5 -d retrain
     #- python run_defense.py --n_epoch=5 -d retrain -dr kernel-pca
 
 
