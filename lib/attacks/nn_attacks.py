@@ -223,7 +223,7 @@ def attack_wrapper(model_dict, data_dict, input_var, target_var, test_prediction
     elif dataset == 'HAR':
         _, _, X_test_orig, _ = load_dataset(model_dict)
 
-    # X_test_orig -= mean
+    X_test_orig -= mean
 
     validator, indexer, predictor, confidence = local_fns(input_var, target_var,
                                                           test_prediction)
