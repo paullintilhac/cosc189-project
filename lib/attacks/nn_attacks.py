@@ -37,7 +37,9 @@ def fgs(model_dict, data_dict, x_curr, y_curr, x_curr_orig, adv_x, dev_mag, b_c,
     channels = data_dict['channels']
     # Gradient w.r.t to input and current class
     delta_x = gradient(x_curr, y_curr)
+    print("made it here")
     if dr_alg is not None:
+        print("getting gradient transform")
         A = gradient_transform(model_dict, dr_alg)
         delta_x = np.dot(delta_x.reshape(batch_len, no_of_features), A)
 
@@ -95,6 +97,7 @@ def fg(model_dict, data_dict, x_curr, y_curr, x_curr_orig, adv_x, dev_mag, b_c,
     delta_x = gradient(x_curr, y_curr)
 
     if dr_alg is not None:
+        print("doing gradient transform")
         A = gradient_transform(model_dict, dr_alg)
         delta_x = np.dot(delta_x.reshape(batch_len, no_of_features), A)
 
