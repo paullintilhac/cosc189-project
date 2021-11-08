@@ -162,7 +162,7 @@ def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
     small = model_dict['small']
     gamma = model_dict['gamma']
     kernel = model_dict['kernel']
-
+    print("rd in model_setup: " + str(rd))
     if rd:
         # Doing dimensionality reduction on dataset
         print("Doing {} with rd={} over the training data".format(dim_red, rd))

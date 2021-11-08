@@ -203,7 +203,8 @@ def gradient_transform(model_dict, dr_alg):
     rev = model_dict['rev']
 
     # A is transformation matrix of dr_alg
-    if DR == 'pca':
+    if DR == 'pca' or DR == 'kernel-pca':
+        #print("doing gradient transform")
         if rev == None:
             A = dr_alg.components_
         elif rev != None:
@@ -232,8 +233,8 @@ def gradient_transform(model_dict, dr_alg):
     else:
         raise ValueError('Cannot get transformation matrix from this \
                           dimensionality reduction')
-    print("gradient transform for kernel-pca")
-    print("A: "+str(A))
+    #print("gradient transform for kernel-pca")
+    #print("A: "+str(A))
     return A
 #------------------------------------------------------------------------------#
 
