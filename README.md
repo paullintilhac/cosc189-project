@@ -1,3 +1,4 @@
+[![Build Status](https://app.travis-ci.com/paullintilhac/cosc189-project.svg?branch=master)](https://app.travis-ci.com/paullintilhac/cosc189-project)
 ## ml_defense: Attacks and Defenses for Machine Learning Systems
 
 ### Overview
