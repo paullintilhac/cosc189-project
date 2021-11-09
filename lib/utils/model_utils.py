@@ -106,6 +106,7 @@ def model_creator(model_dict, data_dict, input_var, target_var, rd=None,
 
     abs_path_m = resolve_path_m(model_dict)
     model_path = abs_path_m + get_model_name(model_dict, rd)
+    print("model path: " + str(model_path))
     model_exist_flag = 0
     if os.path.exists(model_path + '.npz'):
         model_exist_flag = 1
