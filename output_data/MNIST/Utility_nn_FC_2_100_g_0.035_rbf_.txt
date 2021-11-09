@@ -1,0 +1,8 @@
+No_kernel-pca:	93.820, 0.925
+kernel-pca_100:	86.260, 0.744
+No_kernel-pca:	93.820, 0.925
+No_kernel-pca:	97.300, 0.985
+No_kernel-pca:	97.300, 0.985
+kernel-pca_100:	94.640, 0.942
+No_kernel-pca:	97.300, 0.985
+kernel-pca_100:	94.640, 0.942

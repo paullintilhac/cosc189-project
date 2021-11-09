@@ -1,0 +1,2 @@
+Epoch, training loss, validation loss, validation accuracy, 
+1,  2.301474, 		2.298863, 		0.120000, 
