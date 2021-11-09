@@ -189,6 +189,8 @@ def model_trainer(input_var, target_var, prediction, test_prediction, params,
             print("  validation loss:\t\t{:.6f}".format(val_err / val_batches))
             print("  validation accuracy:\t\t{:.2f} %".format(
                   val_acc / val_batches * 100))
+
+            epoch_data_write(model_dict, epoch, train_err, val_err, train_batches, val_batches, val_acc)
 #------------------------------------------------------------------------------#
 
 

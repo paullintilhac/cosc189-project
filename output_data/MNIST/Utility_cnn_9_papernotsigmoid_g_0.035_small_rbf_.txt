@@ -1,0 +1,10 @@
+No_kernel-pca:	21.020, 0.102
+kernel-pca_rev_100:	21.380, 0.102
+No_kernel-pca:	21.020, 0.102
+kernel-pca_rev_100:	21.380, 0.102
+No_kernel-pca:	21.020, 0.102
+No_kernel-pca:	21.020, 0.102
+No_kernel-pca:	21.020, 0.102
+kernel-pca_100:	86.560, 0.939
+No_kernel-pca:	21.020, 0.102
+kernel-pca_rev_100:	21.380, 0.102
