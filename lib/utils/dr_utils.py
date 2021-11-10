@@ -14,7 +14,7 @@ from lib.utils.AntiWhiten import AntiWhiten
 #------------------------------------------------------------------------------#
 
 
-def kernel_pca_dr(X_train, X_test, rd,kernel="linear",gamma=None,X_val=None, rev=None, **kwargs):
+def kernel_pca_dr(X_train, X_test, rd,kernel="rbf",gamma=None,X_val=None, rev=None, **kwargs):
     """
     Perform kernel PCA on X_train then transform X_train, X_test (and X_val).
     Return transformed data in original space if rev is True; otherwise, return
