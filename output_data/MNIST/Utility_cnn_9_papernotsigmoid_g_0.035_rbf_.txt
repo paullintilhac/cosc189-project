@@ -3,3 +3,5 @@ kernel-pca_rev_50:	95.630, 0.975
 No_kernel-pca:	96.700, 0.981
 No_kernel-pca:	96.700, 0.981
 kernel-pca_rev_50:	95.630, 0.975
+No_kernel-pca:	96.700, 0.981
+kernel-pca_50:	95.990, 0.991
