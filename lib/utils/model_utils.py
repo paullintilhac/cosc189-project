@@ -273,8 +273,8 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
     if rd != None:
         # Doing dimensionality reduction on dataset
         print("Doing {} with rd={} over the training data".format(dim_red, rd))
-        _, _, _, dr_alg = dr_wrapper(X_train, X_test, dim_red, rd, y_train, rev,
-                                     X_val)
+        _, _, _, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small = None, gamma=None, kernel='rbf')
+
     else:
         dr_alg = None
 

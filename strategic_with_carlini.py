@@ -33,7 +33,7 @@ def main():
     if (dataset == 'MNIST'):
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(model_dict)
         # rd_list = [None, 784, 331, 200, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
-        rd_list = [None, 331, 100, 80, 60, 40, 20]
+        rd_list = [None, 50]
         # rd_list = [None,784,100]
     elif dataset == 'GTSRB':
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(model_dict)
