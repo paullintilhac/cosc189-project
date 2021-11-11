@@ -88,11 +88,12 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
     print("running retrain_defense")
     # Parameters
     rev_flag = None
-
+    
     data_dict, test_prediction, dr_alg, X_test, input_var, target_var = \
         model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
                     rd)
-
+    print("dr_alg in retrain defense:  " + str(dr_alg))
+    print("model dict in retrain defense: " + str(model_dict))
     validator, indexer, predictor, confidence = local_fns(input_var, target_var,
                                                           test_prediction)
 

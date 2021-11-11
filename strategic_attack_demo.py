@@ -26,7 +26,7 @@ def strategic_attack(rd, model_dict, dev_list, X_train, y_train, X_test, y_test,
     rev_flag = model_dict['rev']
     layer_flag = None
     dim_red = model_dict['dim_red']
-
+    print("rd in strategic attack demo: " + str(rd))
     data_dict, test_prediction, dr_alg, X_test, input_var, target_var = \
         model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
                     rd, layer=layer_flag)
@@ -89,8 +89,8 @@ def main():
 
     # Running attack and saving samples
     print('Creating adversarial samples...')
-    adv_x_ini = attack_wrapper(model_dict, data_dict, input_var,
-                                            target_var, test_prediction, dev_list, X_test, y_test, mean=mean)
+    #adv_x_ini = attack_wrapper(model_dict, data_dict, input_var,
+    #                                        target_var, test_prediction, dev_list, X_test, y_test, mean=mean)
     # print_output(model_dict, output_list, dev_list)
 
     # save_images(model_dict, data_dict, X_test, adv_x_ini, dev_list, mean)
@@ -98,9 +98,10 @@ def main():
     # partial_strategic_attack=partial(strategic_attack,X_train=X_train,
     # y_train=y_train,X_test=X_test,y_test=y_test,X_val=X_val,y_val=y_val)
 
-    # for rd in rd_list:
-    #     strategic_attack(rd, model_dict, dev_list, X_train, y_train, X_test,
-    #                      y_test, mean, X_val, y_val)
+    for rd in rd_list:
+        strategic_attack(rd, model_dict, dev_list, X_train, y_train, X_test,
+                         y_test, mean, X_val, y_val)
+
 
     # partial_strategic_attack(784)
     # pool=multiprocessing.Pool(processes=8)

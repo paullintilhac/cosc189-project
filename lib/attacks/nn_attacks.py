@@ -37,7 +37,9 @@ def fgs(model_dict, data_dict, x_curr, y_curr, x_curr_orig, adv_x, dev_mag, b_c,
     channels = data_dict['channels']
     # Gradient w.r.t to input and current class
     delta_x = gradient(x_curr, y_curr)
+    print("made it here")
     if dr_alg is not None:
+        print("getting gradient transform")
         A = gradient_transform(model_dict, dr_alg)
         delta_x = np.dot(delta_x.reshape(batch_len, no_of_features), A)
 
@@ -93,8 +95,8 @@ def fg(model_dict, data_dict, x_curr, y_curr, x_curr_orig, adv_x, dev_mag, b_c,
     rev = model_dict['rev']
     # Gradient w.r.t to input and current class
     delta_x = gradient(x_curr, y_curr)
-
     if dr_alg is not None:
+        #print("doing gradient transform")
         A = gradient_transform(model_dict, dr_alg)
         delta_x = np.dot(delta_x.reshape(batch_len, no_of_features), A)
 
@@ -223,7 +225,7 @@ def attack_wrapper(model_dict, data_dict, input_var, target_var, test_prediction
     elif dataset == 'HAR':
         _, _, X_test_orig, _ = load_dataset(model_dict)
 
-    # X_test_orig -= mean
+    X_test_orig -= mean
 
     validator, indexer, predictor, confidence = local_fns(input_var, target_var,
                                                           test_prediction)
@@ -234,6 +236,7 @@ def attack_wrapper(model_dict, data_dict, input_var, target_var, test_prediction
     test_acc = acc_fn(test_prediction, target_var)
     validator = val_fn(input_var, target_var, test_loss, test_acc)
     print("dev_list: " + str(dev_list))
+    print("dr_alg in attack wrapper: " + str(dr_alg))
     o_list = []
     mag_count = 0
     for dev_mag in dev_list:
