@@ -344,7 +344,12 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         mean_flat = mean.reshape(-1, 784)
 
         # l2-Carlini Attack
-        import tensorflow as tf
+        import tensorflow.compat.v1 as tf
+        from tensorflow.python.framework.ops import disable_eager_execution
+
+        tf.disable_v2_behavior()
+        disable_eager_execution()
+
         import time
         from l2_attack import CarliniL2
 
