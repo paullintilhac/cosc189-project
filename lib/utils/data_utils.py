@@ -141,7 +141,8 @@ def get_model_name(model_dict, rd = None):
         m_name += '_drop'
     if kernel is not None:
         m_name += '_{}_'.format(kernel)
-    print("getting model name: " + m_name)
+
+    m_name += "_" + str(model_dict['num_epochs'])
     return m_name
 #------------------------------------------------------------------------------#
 
@@ -521,7 +522,7 @@ def utility_write(model_dict, test_acc, test_conf, rd):
     Write utility (accuracy and confidence on test set) of the model on a file.
     The output file is saved in output_data folder.
     """
-
+    print("getting model name for utility write")
     fname = get_model_name(model_dict)
     fname = 'Utility_' + fname + '.txt'
     abs_path_o = resolve_path_o(model_dict)
@@ -539,6 +540,27 @@ def utility_write(model_dict, test_acc, test_conf, rd):
     ofile.close()
 #------------------------------------------------------------------------------#
 
+def epoch_data_write(model_dict, epoch, train_err, val_err, train_batches, val_batches, val_acc):
+    """
+    Write utility (accuracy and confidence on test set) of the model on a file.
+    The output file is saved in output_data folder.
+    """
+    print("getting model name for epoch data write")
+    fname = get_model_name(model_dict)
+    fname = 'epoch_data_write' + fname + '.txt'
+    abs_path_o = resolve_path_o(model_dict)
+    ofile = open(abs_path_o + fname, 'a')
+    if(epoch == 0):
+        ofile.write("Epoch, training loss, validation loss, validation accuracy, \n")
+    ofile.write(str(epoch + 1) + ', ')
+    ofile.write(" {:.6f}".format(train_err / train_batches) + ', ')
+    ofile.write("\t\t{:.6f}".format(val_err / val_batches) + ', ')
+    ofile.write("\t\t{:.6f}".format(val_acc / val_batches) + ', ')
+    ofile.write('\n')
+    ofile.close()
+#------------------------------------------------------------------------------#
+
+
 
 def file_create(model_dict, is_defense, rd, strat_flag=None):
     """
@@ -550,6 +572,7 @@ def file_create(model_dict, is_defense, rd, strat_flag=None):
     abs_path_o = resolve_path_o(model_dict)
 
     fname = model_dict['attack']
+    print("getting model name for file create")
     fname += '_' + get_model_name(model_dict)
     reg = model_dict['reg']
     rev = model_dict['rev']
@@ -673,7 +696,7 @@ def resolve_path_v(model_dict):
     -------
     absolute path to visual data directory
     """
-
+    print("getting model nae in resolve_path_v")
     model_name = get_model_name(model_dict)
     dataset = model_dict['dataset']
     channels = model_dict['channels']

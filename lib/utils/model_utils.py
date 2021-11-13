@@ -105,6 +105,7 @@ def model_creator(model_dict, data_dict, input_var, target_var, rd=None,
                                    float(drop_hidden))
 
     abs_path_m = resolve_path_m(model_dict)
+    print("getting model name in model_creator")
     model_path = abs_path_m + get_model_name(model_dict, rd)
     model_exist_flag = 0
     if os.path.exists(model_path + '.npz'):
@@ -123,6 +124,7 @@ def model_loader(model_dict, rd=None):
     """
     print("loading model...")
     #print(str(model_dict))
+    print("getting model name in model loader")
     mname = get_model_name(model_dict, rd)
     abs_path_m = resolve_path_m(model_dict)
 
@@ -141,6 +143,7 @@ def model_saver(network, model_dict, rd=None):
     """
     print("saving model")
     #print(str(model_dict))
+    print("getting model name in model saver")
     mname = get_model_name(model_dict, rd)
     abs_path_m = resolve_path_m(model_dict)
 
@@ -364,6 +367,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
             # Resolve absolute path to output directory
             abs_path_o = resolve_path_o(model_dict)
 
+            print("getting model name in model setup carlini")
             fname = 'carlini_l2'
             fname += '_' + get_model_name(model_dict)
 
