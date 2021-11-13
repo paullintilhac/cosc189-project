@@ -46,8 +46,11 @@ def kernel_pca_dr(X_train, X_test, rd,kernel="linear",gamma=None,X_val=None, rev
             return X_train_rev, X_test_rev, kpca
     else:
         if X_val is not None:
+            print("dr_alg: " + str(kpca))
             return X_train_dr, X_test_dr, X_val_dr, kpca
         else:
+            print("dr_alg when X_val is none: " + str(kpca))
+
             return X_train_dr, X_test_dr, kpca
 #------------------------------------------------------------------------------#
 
@@ -200,7 +203,8 @@ def gradient_transform(model_dict, dr_alg):
     rev = model_dict['rev']
 
     # A is transformation matrix of dr_alg
-    if DR == 'pca':
+    if DR == 'pca' or DR == 'kernel-pca':
+        #print("doing gradient transform")
         if rev == None:
             A = dr_alg.components_
         elif rev != None:
@@ -229,6 +233,8 @@ def gradient_transform(model_dict, dr_alg):
     else:
         raise ValueError('Cannot get transformation matrix from this \
                           dimensionality reduction')
+    #print("gradient transform for kernel-pca")
+    #print("A: "+str(A))
     return A
 #------------------------------------------------------------------------------#
 
@@ -303,6 +309,6 @@ def dr_wrapper(X_train, X_test, X_val, DR, rd, y_train, rev=None,small=None,gamm
         X_test = X_test.reshape((test_len, channels, height, width))
         if X_val is not None and len(X_val)>0:
             X_val = X_val.reshape((val_len, channels, height, width))
-
+    print("dr_alg at the end off dr_wrapper: " + str(dr_alg))
     return X_train, X_test, X_val, dr_alg
 #------------------------------------------------------------------------------#

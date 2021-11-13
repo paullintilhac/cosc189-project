@@ -165,7 +165,7 @@ def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
     small = model_dict['small']
     gamma = model_dict['gamma']
     kernel = model_dict['kernel']
-
+    print("rd in model_setup: " + str(rd))
     if rd:
         # Doing dimensionality reduction on dataset
         print("Doing {} with rd={} over the training data".format(dim_red, rd))
@@ -173,7 +173,7 @@ def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
                                                     dim_red, rd, y_train, rev,small, gamma, kernel)
     else:
         dr_alg = None
-
+    print("dr_alg in model_setup: " + str(dr_alg))
     # Getting data parameters after dimensionality reduction
     data_dict = get_data_shape(X_train, X_test, X_val)
     no_of_dim = data_dict['no_of_dim']
