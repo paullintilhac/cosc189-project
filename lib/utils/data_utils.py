@@ -245,12 +245,12 @@ def load_dataset_GTSRB(model_dict):
 
         with open(file, mode='rb') as f:
             dataset = pickle.load(f)
-        #shuffle dataset so it can be used with the "--small" flag
-        # data_labels = dataset["labels"]
-        # data_features = dataset["features"]
-        # shuffled_features, shuffled_labels = shuffle(dataset["features"], dataset["labels"], random_state=0)
-        # dataset["labels"] = shuffled_labels
-        # dataset["features"] = shuffled_features
+        # shuffle dataset so it can be used with the "--small" flag
+        data_labels = dataset["labels"]
+        data_features = dataset["features"]
+        shuffled_features, shuffled_labels = shuffle(dataset["features"], dataset["labels"], random_state=0)
+        dataset["labels"] = shuffled_labels
+        dataset["features"] = shuffled_features
         return tuple(map(lambda c: (dataset[c]), columns))
 
     def preprocess(X, channels):
