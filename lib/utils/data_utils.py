@@ -280,6 +280,18 @@ def load_dataset_GTSRB(model_dict):
     X_train = preprocess(X_train, channels)
     X_val = preprocess(X_val, channels)
     X_test = preprocess(X_test, channels)
+    if model_dict['small']:
+        TRUNCATION = 5000
+        X_train = X_train[:TRUNCATION]
+        X_test = X_test[:TRUNCATION]
+        y_train = y_train[:TRUNCATION]
+        y_test = y_test[:TRUNCATION]
+        X_train, X_val = X_train[:-1000], X_train[-1000:]
+        y_train, y_val = y_train[:-1000], y_train[-1000:]
+    else:
+        # We reserve the last 10000 training examples for validation. 
+        X_train, X_val = X_train[:-10000], X_train[-10000:]
+        y_train, y_val = y_train[:-10000], y_train[-10000:]
     return X_train, y_train, X_val, y_val, X_test, y_test
 #------------------------------------------------------------------------------#
 
