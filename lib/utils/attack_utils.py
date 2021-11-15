@@ -126,6 +126,7 @@ def acc_calc_all(X_adv, y_test, X_test_mod, i_c, validator, indexer, predictor,
     c_p, conf_p = acc_calc(X_adv[i_c], y_test[i_c], validator, indexer,
                            confidence)
     o_list.extend([c_p, conf_p])
+    print("o_list: " + str(o_list))
     return o_list
 #------------------------------------------------------------------------------#
 

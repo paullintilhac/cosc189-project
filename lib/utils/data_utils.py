@@ -12,10 +12,10 @@ import pickle
 # from scipy.misc import imsave
 from matplotlib import pyplot as plt
 from matplotlib import image as img
-
+import random
 from os.path import dirname
 from sklearn.preprocessing import StandardScaler
-
+from sklearn.utils import shuffle
 from lib.utils.AntiWhiten import AntiWhiten
 
 #------------------------------------------------------------------------------#
@@ -245,14 +245,19 @@ def load_dataset_GTSRB(model_dict):
 
         with open(file, mode='rb') as f:
             dataset = pickle.load(f)
-        return tuple(map(lambda c: dataset[c], columns))
+        #shuffle dataset so it can be used with the "--small" flag
+        # data_labels = dataset["labels"]
+        # data_features = dataset["features"]
+        # shuffled_features, shuffled_labels = shuffle(dataset["features"], dataset["labels"], random_state=0)
+        # dataset["labels"] = shuffled_labels
+        # dataset["features"] = shuffled_features
+        return tuple(map(lambda c: (dataset[c]), columns))
 
     def preprocess(X, channels):
         """
         Preprocess dataset: turn images into grayscale if specified, normalize
         input space to [0,1], reshape array to appropriate shape for NN model
         """
-
         if channels == 3:
             # Scale features to be in [0, 1]
             X = (X / 255.).astype(np.float32)
@@ -267,7 +272,7 @@ def load_dataset_GTSRB(model_dict):
             X = X.reshape(X.shape[0], 1, X.shape[1], X.shape[2])
         return X
 
-    # Load pickle dataset
+    # Load pickle datase
     abs_path_i = resolve_path_i(model_dict)
     X_train, y_train = load_pickled_data(abs_path_i + 'train.p',
                                          ['features', 'labels'])
@@ -280,18 +285,21 @@ def load_dataset_GTSRB(model_dict):
     X_train = preprocess(X_train, channels)
     X_val = preprocess(X_val, channels)
     X_test = preprocess(X_test, channels)
+
+    print("X_train: " + str(X_train.shape) + ", y_train: " + str(y_train.shape) + ", X_test: " + str(X_test.shape) + ", y_test: " + str(y_test.shape))
+
     if model_dict['small']:
         TRUNCATION = 5000
         X_train = X_train[:TRUNCATION]
         X_test = X_test[:TRUNCATION]
         y_train = y_train[:TRUNCATION]
         y_test = y_test[:TRUNCATION]
-        X_train, X_val = X_train[:-1000], X_train[-1000:]
-        y_train, y_val = y_train[:-1000], y_train[-1000:]
-    else:
-        # We reserve the last 10000 training examples for validation. 
-        X_train, X_val = X_train[:-10000], X_train[-10000:]
-        y_train, y_val = y_train[:-10000], y_train[-10000:]
+        X_val = X_val[:TRUNCATION]
+        y_val = y_val[:TRUNCATION]
+        
+    
+    print("after: X_train: " + str(X_train.shape) + ", y_train: " + str(y_train.shape) + ", X_test: " + str(X_test.shape) + ", y_test: " + str(y_test.shape))
+
     return X_train, y_train, X_val, y_val, X_test, y_test
 #------------------------------------------------------------------------------#
 
