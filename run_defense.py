@@ -29,8 +29,8 @@ def main(argv):
     # Parameters
 
     batchsize = 500                         # Fixing batchsize
-    no_of_mags = 2                     # No. of deviations to consider
-    dev_list = np.linspace(2, 4, no_of_mags)
+    no_of_mags = 6                   # No. of deviations to consider
+    dev_list = np.linspace(.001, 2.5, no_of_mags)
 
     # Create model_dict from arguments
     model_dict = model_dict_create()
@@ -76,23 +76,30 @@ def main(argv):
     print("using defense "+str(model_dict['defense']))
     # Run defense
     defense = model_dict['defense']
-    if defense != None:
-        for rd in rd_list:
-            print ("Starting strategic attack...")
-            
-            adv_x_ini, output_list = attack_wrapper(model_dict, data_dict, input_var,
-                    target_var, test_prediction, dev_list, X_test, y_test, mean,
-                                            dr_alg, rd)
-            if defense == 'recons':
-                recons_defense(model_dict, data_dict, input_var, target_var,
-                               test_prediction, dev_list, adv_x_ini, rd,
-                               X_train, y_train, X_test, y_test)
-            elif defense == 'retrain':
-                retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train,
-                                y_train, X_test, y_test, X_val, y_val)
+    
+    for rd in rd_list:
+        print ("Starting strategic attack...")
+        
+        adv_x_ini, output_list = attack_wrapper(model_dict, data_dict, input_var,
+                target_var, test_prediction, dev_list, X_test, y_test, mean,
+                                        dr_alg, rd)
+        print("output_list: " + str(output_list))
+        print_output(model_dict, output_list, dev_list, False, rd)
+        
+        if defense == 'recons':
+            recons_defense(model_dict, data_dict, input_var, target_var,
+                            test_prediction, dev_list, adv_x_ini, rd,
+                            X_train, y_train, X_test, y_test)
+        elif defense == 'retrain':
+            retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train,
+                            y_train, X_test, y_test, X_val, y_val)
+        else: 
+            print("not using defense -- only strategic attack")
+            continue
+
 #-----------------------------------------------------------------------------#
 
-
+    
 if __name__ == '__main__':
     main(sys.argv[1:])
 #-----------------------------------------------------------------------------#
