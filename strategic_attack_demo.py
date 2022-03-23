@@ -83,7 +83,9 @@ def main():
     if (dataset == 'MNIST') or (dataset == 'GTSRB'):
         X_val -= mean
 
-    # Set up model
+    print("X_test.shape: " + str(X_test.shape))
+    print("mean dim : " + str(mean.shape))
+    # Set up model 
     data_dict, test_prediction, dr_alg, X_test, input_var, target_var = \
         model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val)
 

@@ -31,7 +31,7 @@ def model_creator(model_dict, data_dict, input_var, target_var, rd=None,
     DR = model_dict['dim_red']
     n_out = model_dict['n_out']
     no_of_dim = data_dict['no_of_dim']
-
+    print("no_of_dim in model creator: " + str(no_of_dim))
     # Determine input size
     if no_of_dim == 2:
         no_of_features = data_dict['no_of_features']
@@ -45,7 +45,7 @@ def model_creator(model_dict, data_dict, input_var, target_var, rd=None,
         height = data_dict['height']
         width = data_dict['width']
         in_shape = (None, channels, height, width)
-
+    print("in shape: " + str(in_shape))
     #------------------------------- CNN model --------------------------------#
     if model_name == 'cnn':
         if n_epoch is not None:
@@ -166,12 +166,12 @@ def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
     if rd:
         # Doing dimensionality reduction on dataset
         print("Doing {} with rd={} over the training data".format(dim_red, rd))
-        X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val,
-                                                    dim_red, rd, y_train, rev,small, gamma, kernel)
+        X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small, gamma, kernel)
     else:
         dr_alg = None
     print("dr_alg in model_setup: " + str(dr_alg))
     # Getting data parameters after dimensionality reduction
+
     data_dict = get_data_shape(X_train, X_test, X_val)
     no_of_dim = data_dict['no_of_dim']
 
@@ -273,15 +273,16 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
     if rd != None:
         # Doing dimensionality reduction on dataset
         print("Doing {} with rd={} over the training data".format(dim_red, rd))
-        _, _, _, dr_alg = dr_wrapper(X_train, X_test, dim_red, rd, y_train, rev,
-                                     X_val)
+        X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev)
     else:
         dr_alg = None
-
+    #mean = np.mean(X_train, axis=0)
+    
+    print("mean: " + str(mean.shape))
+    print("X_test.shape: " + str(X_test.shape))
     # Getting data parameters after dimensionality reduction
     data_dict = get_data_shape(X_train, X_test, X_val)
     no_of_dim = data_dict['no_of_dim']
-
     # Prepare Theano variables for inputs and targets
     if no_of_dim == 2:
         input_var = T.tensor('inputs')
@@ -316,7 +317,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         from keras.models import Sequential
         from keras.layers import Dense, Dropout, Activation, Flatten
         from keras.layers import Convolution2D, MaxPooling2D
-
+        print("rd: " + str(rd))
         model = Sequential()
         if rd is not None:
             model.add(Dense(rd, activation=None,
@@ -340,6 +341,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         y_onehot[np.arange(len(y_test)), y_test] = 1
         # X_test was mean-subtracted before, now we add the mean back
         X_test_mean = (X_test + mean - 0.5).reshape(-1, 784)
+
         data = (X_test_mean, y_onehot)
         mean_flat = mean.reshape(-1, 784)
 
@@ -348,7 +350,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         import time
         from l2_attack import CarliniL2
 
-        with tf.Session() as sess:
+        with tf.compat.v1.Session() as sess:
             attack = CarliniL2(sess, model, mean_flat, batch_size=10,
                                max_iterations=1000, confidence=0, targeted=False)
 

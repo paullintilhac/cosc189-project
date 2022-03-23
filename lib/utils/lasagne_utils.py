@@ -228,7 +228,8 @@ def build_cnn_rd(input_var, rd):
     Papernot et. al. (2016), but modified to be used with dimension reduced
     data.
     """
-
+    print("input var: " + str(input_var))
+    print("rd: " + str(rd))
     # Input layer, as usual:
     network = lasagne.layers.InputLayer(shape=(None, 1, rd),
                                         input_var=input_var)
