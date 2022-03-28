@@ -19,7 +19,7 @@ INITIAL_CONST = 1e-3     # the initial constant c to pick as a first guess
 
 
 class CarliniL2:
-	def __init__(self, sess, model, mean, batch_size=1, confidence=CONFIDENCE,
+	def __init__(self, sess, model, mean,rd, batch_size=1, confidence=CONFIDENCE,
 				 targeted=TARGETED, learning_rate=LEARNING_RATE,
 				 binary_search_steps=BINARY_SEARCH_STEPS, max_iterations=MAX_ITERATIONS,
 				 abort_early=ABORT_EARLY,
@@ -60,8 +60,9 @@ class CarliniL2:
 		self.batch_size = batch_size
 
 		self.repeat = binary_search_steps >= 10
-
-		shape = (batch_size, 784)
+		if rd is None:
+			rd = 784
+		shape = (batch_size, rd)
 		num_labels = 10
 
 		# the variable we're going to optimize over
@@ -80,6 +81,7 @@ class CarliniL2:
 
 		# the resulting image, tanh'd to keep bounded from -0.5 to 0.5
 		# TODO:
+
 		self.mean = mean
 		self.newimg = tf.tanh(modifier + self.timg) / 2 - mean + 0.5
 

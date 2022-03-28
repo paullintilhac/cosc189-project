@@ -24,8 +24,8 @@ def main():
     model_dict = model_dict_create()
 
     # No. of deviations to consider
-    no_of_mags = 50
-    dev_list = np.linspace(0.1, 5.0, no_of_mags)
+    no_of_mags = 1
+    dev_list = np.linspace(0.1, .1, no_of_mags)
 
     # Load dataset specified in model_dict
     print('Loading data...')
@@ -33,7 +33,7 @@ def main():
     if (dataset == 'MNIST'):
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(model_dict)
         # rd_list = [None, 784, 331, 200, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
-        rd_list = [331]
+        rd_list = [100]
         # rd_list = [None,784,100]
     elif dataset == 'GTSRB':
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(model_dict)

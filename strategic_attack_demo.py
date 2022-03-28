@@ -37,13 +37,10 @@ def strategic_attack(rd, model_dict, dev_list, X_train, y_train, X_test, y_test,
                                             dev_list, X_test, y_test, mean,
                                             dr_alg, rd)
     # Printing result to file
-    # print_output(model_dict, output_list, dev_list, is_defense=False, rd=rd,
-                 # strat_flag=1)
+    print_output(model_dict, output_list, dev_list, is_defense=False, rd=rd,
+                 strat_flag=1)
 
-    # Save adv. samples to images
-    # if (dim_red == 'pca') or (dim_red == 'dca') or (dim_red == None):
-    #     save_images(model_dict, data_dict, X_test, adv_x_all, dev_list,
-    #                 rd, dr_alg, rev=rev_flag)
+    
 #-----------------------------------------------------------------------------#
 
 
@@ -58,7 +55,7 @@ def main():
 
     # No. of deviations to consider
     no_of_mags = 1
-    dev_list = np.linspace(0.1, 0.1, no_of_mags)
+    dev_list = np.linspace(0.1, .1, no_of_mags)
 
     # Load dataset specified in model_dict
     print('Loading data...')
@@ -91,9 +88,10 @@ def main():
 
     # Running attack and saving samples
     print('Creating adversarial samples...')
-    #adv_x_ini = attack_wrapper(model_dict, data_dict, input_var,
-    #                                        target_var, test_prediction, dev_list, X_test, y_test, mean=mean)
-    # print_output(model_dict, output_list, dev_list)
+    adv_x_ini, output_list = attack_wrapper(model_dict, data_dict, input_var,
+                                           target_var, test_prediction, dev_list, X_test, y_test, mean=mean)
+
+    print_output(model_dict, output_list, dev_list,is_defense = False,strat_flag = 1)
 
     # save_images(model_dict, data_dict, X_test, adv_x_ini, dev_list, mean)
 

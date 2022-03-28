@@ -256,6 +256,8 @@ def attack_wrapper(model_dict, data_dict, input_var, target_var, test_prediction
             elif model_dict['attack'] == 'fg':
                 fg(model_dict, data_dict, x_curr, y_curr, x_curr_orig, adv_x,
                    dev_mag, b_c, gradient, dr_alg, rd, mean)
+            #elif model_dict['attack'] == "carlini":
+                
             adv_x_curr = adv_x[b_c * batch_len:(b_c + 1) * batch_len]
             err, acc = validator(adv_x_curr, y_curr)
             test_err += err
