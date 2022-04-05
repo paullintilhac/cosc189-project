@@ -314,7 +314,125 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         print("model exists")
         # Load the correct model:
         param_values = model_loader(model_dict, rd)
-        lasagne.layers.set_all_param_values(network, param_values)  
+        # lasagne.layers.set_all_param_values(network, param_values)  
+        
+        # Create Keras model
+        from keras.models import Sequential
+        from keras.layers import Dense, Dropout, Activation, Flatten
+        from keras.layers import Convolution2D, MaxPooling2D
+
+        model = Sequential()
+        if rd is not None:
+            model.add(Dense(rd, activation=None,
+                            input_shape=(rd,), use_bias=False))
+            model.add(Dense(100, activation='sigmoid'))
+        else:
+            model.add(Dense(100, activation='sigmoid', input_shape=(784,)))
+        model.add(Dense(100, activation='sigmoid'))
+        model.add(Dense(10, activation=None))
+
+        if rd is not None:
+            A = gradient_transform(model_dict, dr_alg)
+            param_values = [A.T] + param_values
+
+        # model.set_weights(param_values)
+        # m_path = './keras/' + get_model_name(model_dict, rd)
+        # model.save(m_path)
+        # model.load_weights(m_path)
+
+        y_onehot = np.zeros((len(y_test), 10))
+        y_onehot[np.arange(len(y_test)), y_test] = 1
+        print("y_onehot.shape: " +str(y_onehot.shape))
+        print("x_test shape: " + str(X_test.shape))
+        print("mean shape: " + str(mean.shape))
+        # X_test was mean-subtracted before, now we add the mean back
+        
+        if rd is None:
+            X_test_mean = (X_test + mean - 0.5).reshape(-1, 784)
+        else:
+            X_test_mean = (X_test + mean - 0.5).reshape(-1, rd)
+
+
+        
+        print("x_test_mean.shape: " + str(X_test_mean.shape))
+
+        data = (X_test_mean, y_onehot)
+        if rd is None:
+            mean_flat = mean.reshape(-1, 784)
+        else:
+            mean_flat = mean.reshape(-1, rd)
+
+        # l2-Carlini Attack
+        import tensorflow.compat.v1 as tf
+        import time
+        from l2_attack import CarliniL2
+
+        with tf.Session() as sess:
+            attack = CarliniL2(sess, model, mean_flat,rd, batch_size=10,
+                               max_iterations=1000, confidence=0, targeted=False)
+
+            inputs, targets = generate_data(data, samples=10000, targeted=False,
+                                            start=0, inception=False)
+            timestart = time.time()
+            adv = attack.attack(inputs, targets, param_values)
+            timeend = time.time()
+
+            print("Took", timeend - timestart,
+                  "seconds to run", len(inputs), "samples.")
+
+            # Resolve absolute path to output directory
+            abs_path_o = resolve_path_o(model_dict)
+
+            fname = 'carlini_l2'
+            fname += '_' + get_model_name(model_dict)
+
+            if rd is not None:
+                fname += '_' + model_dict['dim_red'] + str(rd)
+
+            plotfile = open(abs_path_o + fname + '.txt', 'a')
+            plotfile.write('\\\small{' + str(rd) + '}\n')
+
+            dists = []
+            pred = model.predict(inputs + 0.5 - mean_flat)
+            for i in range(len(adv)):
+                dist = np.linalg.norm((adv[i] + mean_flat) - (inputs[i] + 0.5))
+                if np.argmax(pred[i]) == y_test[i]:
+                    dists.append(dist)
+                if i < 50:
+                    # Save original test and adversarial images
+                    x_adv = (adv[i] + mean_flat).reshape((28, 28))
+                    orig = (inputs[i] + 0.5).reshape((28, 28))
+                    img.imsave('./carlini_images/{}_adv.png'.format(i),
+                               x_adv * 255, vmin=0, vmax=255, cmap='gray')
+                    img.imsave('./carlini_images/{}_orig.png'.format(i),
+                               orig * 255, vmin=0, vmax=255, cmap='gray')
+
+            # Test overall accuracy of the model
+            pred = model.predict(inputs + 0.5 - mean_flat)
+            correct = 0
+            for i in range(pred.shape[0]):
+                if np.argmax(pred[i]) == y_test[i]:
+                    correct += 1
+            print('Overall accuracy on test images: ',
+                  correct / float(pred.shape[0]))
+
+            pred = model.predict(adv)
+            correct = 0
+            for i in range(pred.shape[0]):
+                if np.argmax(pred[i]) == y_test[i]:
+                    correct += 1
+            print('Overall accuracy on adversarial images: ',
+                  correct / float(pred.shape[0]))
+
+            dists_sorted = sorted(dists)
+
+            for i in range(len(dists)):
+                plotfile.write('{} {} \n'.format(i, dists_sorted[i]))
+
+            # Plot histogram
+            # import matplotlib.pyplot as plt
+            # dists = np.array(dists)
+            # ax.hist(dists, 50, normed=1, histtype='step', cumulative=True,label=str(rd))
 
     elif model_exist_flag == 0:
         print("model does not exist")

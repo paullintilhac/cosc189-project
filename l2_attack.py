@@ -9,6 +9,8 @@ import sys
 import tensorflow.compat.v1 as tf
 import numpy as np
 
+tf.disable_v2_behavior()
+
 BINARY_SEARCH_STEPS = 9  # number of times to adjust the constant with binary search
 MAX_ITERATIONS = 10000   # number of iterations to perform gradient descent
 ABORT_EARLY = True       # if we stop improving, abort gradient descent early
@@ -19,7 +21,7 @@ INITIAL_CONST = 1e-3     # the initial constant c to pick as a first guess
 
 
 class CarliniL2:
-	def __init__(self, sess, model, mean,rd, batch_size=1, confidence=CONFIDENCE,
+	def __init__(self, sess, model, mean, rd, batch_size=1, confidence=CONFIDENCE,
 				 targeted=TARGETED, learning_rate=LEARNING_RATE,
 				 binary_search_steps=BINARY_SEARCH_STEPS, max_iterations=MAX_ITERATIONS,
 				 abort_early=ABORT_EARLY,

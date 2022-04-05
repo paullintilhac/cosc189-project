@@ -12,6 +12,30 @@ from lib.utils.data_utils import *
 from lib.utils.model_utils import *
 from lib.attacks.nn_attacks import *
 
+def carlini_l2_attack(rd, model_dict, dev_list, X_train, y_train, X_test, y_test,
+                     mean, X_val=None, y_val=None):
+    """
+    Helper function called by main() to setup NN model, attack it, print results
+    and save adv. sample images.
+    """
+
+    # Parameters
+    rev_flag = model_dict['rev']
+    layer_flag = None
+    dim_red = model_dict['dim_red']
+    print("rd in strategic attack demo: " + str(rd))
+    data_dict, test_prediction, dr_alg, X_test, input_var, target_var = \
+        model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
+                    rd, layer=layer_flag)
+
+    print ("Starting strategic attack...")
+    adv_x_all, output_list = attack_wrapper(model_dict, data_dict, input_var,
+                                            target_var, test_prediction,
+                                            dev_list, X_test, y_test, mean,
+                                            dr_alg, rd)
+    # Printing result to file
+    print_output(model_dict, output_list, dev_list, is_defense=False, rd=rd,strat_flag=1)
+    
 #-----------------------------------------------------------------------------#
 def main():
 
@@ -33,7 +57,7 @@ def main():
     if (dataset == 'MNIST'):
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(model_dict)
         # rd_list = [None, 784, 331, 200, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
-        rd_list = [100]
+        rd_list = [None]
         # rd_list = [None,784,100]
     elif dataset == 'GTSRB':
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(model_dict)
@@ -52,7 +76,13 @@ def main():
     # fig, ax = plt.subplots(nrows=1, ncols=1)
     for rd in rd_list:
         model_setup_carlini(rd,model_dict, X_train, y_train, X_test, y_test, X_val, y_val,mean)
-
+        print ("Starting strategic attack...")
+        adv_x_all, output_list = attack_wrapper(model_dict, data_dict, input_var,
+                                            target_var, test_prediction,
+                                            dev_list, X_test, y_test, mean,
+                                            dr_alg, rd)
+    # Printing result to file
+    print_output(model_dict, output_list, dev_list, is_defense=False, rd=rd,strat_flag=1)
     
     # dim_red = model_dict['dim_red']
     # plt.legend()
