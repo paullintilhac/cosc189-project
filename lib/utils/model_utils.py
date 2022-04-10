@@ -31,7 +31,7 @@ def model_creator(model_dict, data_dict, input_var, target_var, rd=None,
     DR = model_dict['dim_red']
     n_out = model_dict['n_out']
     no_of_dim = data_dict['no_of_dim']
-
+    print("no_of_dim in model creator: " + str(no_of_dim))
     # Determine input size
     if no_of_dim == 2:
         no_of_features = data_dict['no_of_features']
@@ -45,7 +45,7 @@ def model_creator(model_dict, data_dict, input_var, target_var, rd=None,
         height = data_dict['height']
         width = data_dict['width']
         in_shape = (None, channels, height, width)
-
+    print("in shape: " + str(in_shape))
     #------------------------------- CNN model --------------------------------#
     if model_name == 'cnn':
         if n_epoch is not None:
@@ -166,12 +166,12 @@ def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
     if rd:
         # Doing dimensionality reduction on dataset
         print("Doing {} with rd={} over the training data".format(dim_red, rd))
-        X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val,
-                                                    dim_red, rd, y_train, rev,small, gamma, kernel)
+        X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small, gamma, kernel)
     else:
         dr_alg = None
     print("dr_alg in model_setup: " + str(dr_alg))
     # Getting data parameters after dimensionality reduction
+
     data_dict = get_data_shape(X_train, X_test, X_val)
     no_of_dim = data_dict['no_of_dim']
 
@@ -204,9 +204,11 @@ def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
     # Building or loading model depending on existence
     if model_exist_flag == 1:
         # Load the correct model:
+        print("model exists")
         param_values = model_loader(model_dict, rd)
         lasagne.layers.set_all_param_values(network, param_values)
     elif model_exist_flag == 0:
+        print("model does not exist")
         # Launch the training loop.
         print("Starting training...")
         if layer is not None:
@@ -273,15 +275,16 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
     if rd != None:
         # Doing dimensionality reduction on dataset
         print("Doing {} with rd={} over the training data".format(dim_red, rd))
-        _, _, _, dr_alg = dr_wrapper(X_train, X_test, dim_red, rd, y_train, rev,
-                                     X_val)
+        X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev)
     else:
         dr_alg = None
-
+    mean = np.mean(X_train, axis=0)
+    
+    print("mean: " + str(mean.shape))
+    print("X_test.shape: " + str(X_test.shape))
     # Getting data parameters after dimensionality reduction
     data_dict = get_data_shape(X_train, X_test, X_val)
     no_of_dim = data_dict['no_of_dim']
-
     # Prepare Theano variables for inputs and targets
     if no_of_dim == 2:
         input_var = T.tensor('inputs')
@@ -308,6 +311,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
 
     # Building or loading model depending on existence
     if model_exist_flag == 1:
+        print("model exists")
         # Load the correct model:
         param_values = model_loader(model_dict, rd)
         #lasagne.layers.set_all_param_values(network, param_values)
@@ -448,7 +452,9 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
             # dists = np.array(dists)
             # ax.hist(dists, 50, normed=1, histtype='step', cumulative=True,label=str(rd))
 
+
     elif model_exist_flag == 0:
+        print("model does not exist")
         # Launch the training loop.
         print("Starting training...")
         if layer is not None:
@@ -462,5 +468,4 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         model_saver(network, model_dict, rd)
 
     # Evaluating on retrained inputs
-    # test_model_eval(model_dict, input_var, target_var, test_prediction,
-    #                 X_test, y_test, rd)
+    test_model_eval(model_dict, input_var, target_var, test_prediction, X_test, y_test, rd)

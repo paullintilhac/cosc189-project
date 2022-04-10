@@ -35,7 +35,7 @@ def model_dict_create():
                         help='Specify number of epochs for training')
     parser.add_argument('-a', '--attack', default='fg', type=str,
                         help='Specify method to create adversarial samples')
-    parser.add_argument('-d', '--defense', default='recons', type=str,
+    parser.add_argument('-d', '--defense', default=None, type=str,
                         help='Specify defense mechanism')
     parser.add_argument('-dr', '--dim_red', default='pca', type=str,
                         help='Specify dimension reduction scheme')

@@ -110,6 +110,7 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
         X_adv = reshape_data(X_adv, data_dict, rd)
 
         output_list.append(acc_calc_all(X_adv, y_test, X_test, i_c, validator, indexer, predictor, confidence))
+        print("output_list: " + str(output_list))
         err, acc = validator(X_adv, y_test)
         print("real test accurcy: " + str(acc))
         print("Final results for {}:".format(dev_list[mag_count]))
