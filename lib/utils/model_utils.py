@@ -329,22 +329,22 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         # and why was the input shape here still 784? It could be wrong, but also worth thinking 
         # about what they were doing. I don't know keras very well so I can't say for sure.
         if rd is not None:
-            model.add(Conv2D(32, (3, 3),
+            model.add(Conv2D(32, (5, 5),
                          input_shape=(rd, 1)))
         else:
-            model.add(Conv2D(32, (3, 3),
+            model.add(Conv2D(32, (5, 5),
                          input_shape=(784, 1)))
 
-        model.add(Conv2D(32, (3, 3),
+        model.add(Conv2D(32, (5, 5),
                          input_shape=(28, 28, 1)))
         model.add(Activation('relu'))
-        model.add(Conv2D(32, (3, 3)))
+        model.add(Conv2D(32, (5, 5)))
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         
-        model.add(Conv2D(64, (3, 3)))
+        model.add(Conv2D(64, (5, 5)))
         model.add(Activation('relu'))
-        model.add(Conv2D(64, (3, 3)))
+        model.add(Conv2D(64, (5, 5)))
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         
