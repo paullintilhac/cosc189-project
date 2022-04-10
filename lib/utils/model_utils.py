@@ -318,14 +318,44 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         from keras.layers import Convolution2D, MaxPooling2D
 
         model = Sequential()
+
+        # paul note: this is what makes sense to me for handling the rd is none and not none cases,
+        # but it doesn't actually mirror the original code for bhagoji. 
+        # that code has two lines for the rd is not none case it looked like this:
+        #   model.add(Dense(rd, activation=None,
+        #                    input_shape=(784,), use_bias=False))
+        #    model.add(Dense(100, activation='sigmoid'))
+        # why? isn't this adding two layers where the rd is none case only adds one?
+        # and why was the input shape here still 784? It could be wrong, but also worth thinking 
+        # about what they were doing. I don't know keras very well so I can't say for sure.
         if rd is not None:
-            model.add(Dense(rd, activation=None,
-                            input_shape=(784,), use_bias=False))
-            model.add(Dense(100, activation='sigmoid'))
+            model.add(Conv2D(32, (3, 3),
+                         input_shape=(rd, 1)))
         else:
-            model.add(Dense(100, activation='sigmoid', input_shape=(784,)))
-        model.add(Dense(100, activation='sigmoid'))
-        model.add(Dense(10, activation=None))
+            model.add(Conv2D(32, (3, 3),
+                         input_shape=(784, 1)))
+
+        model.add(Conv2D(32, (3, 3),
+                         input_shape=(28, 28, 1)))
+        model.add(Activation('relu'))
+        model.add(Conv2D(32, (3, 3)))
+        model.add(Activation('relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        
+        model.add(Conv2D(64, (3, 3)))
+        model.add(Activation('relu'))
+        model.add(Conv2D(64, (3, 3)))
+        model.add(Activation('relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        
+        model.add(Flatten())
+        model.add(Dense(200))
+        model.add(Activation('relu'))
+        model.add(Dense(200))
+        model.add(Activation('relu'))
+        model.add(Dense(10))
+        model.load_weights(restore)
+
 
         if rd is not None:
             A = gradient_transform(model_dict, dr_alg)
@@ -339,8 +369,11 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         y_onehot = np.zeros((len(y_test), 10))
         y_onehot[np.arange(len(y_test)), y_test] = 1
         # X_test was mean-subtracted before, now we add the mean back
+        ## paul note: why are we subtracting .5 here?
+        ## probably need conditional statement here to handle if rd is not none
         X_test_mean = (X_test + mean - 0.5).reshape(-1, 784)
         data = (X_test_mean, y_onehot)
+        # paul note: also probly need conditional here for rd not none
         mean_flat = mean.reshape(-1, 784)
 
         # l2-Carlini Attack
@@ -349,7 +382,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         from l2_attack import CarliniL2
 
         with tf.Session() as sess:
-            attack = CarliniL2(sess, model, mean_flat, batch_size=10,
+            attack = CarliniL2(sess, model, batch_size=10,
                                max_iterations=1000, confidence=0, targeted=False)
 
             inputs, targets = generate_data(data, samples=10000, targeted=False,
