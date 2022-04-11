@@ -275,6 +275,7 @@ def build_cnn_rd(input_var, rd):
 # hidden layers in front of the output layer.
 def build_cnn(in_shape, n_out, input_var=None):
     # Input layer, as usual:
+    print("in_shape: " + str(in_shape))
     network = lasagne.layers.InputLayer(shape=in_shape, input_var=input_var)
 
     # 2 Convolutional layers with 32 kernels of size 5x5.

@@ -314,12 +314,16 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         print("model exists")
         # Load the correct model:
         param_values = model_loader(model_dict, rd)
+
+        print("param values shape: " + str(len(param_values)))
+        print("param values[0] shape: " + str(len(param_values[0])))
+
         #lasagne.layers.set_all_param_values(network, param_values)
 
         # Create Keras model
         from keras.models import Sequential
         from keras.layers import Dense, Dropout, Activation, Flatten
-        from keras.layers import Convolution2D, MaxPooling2D
+        from keras.layers import Conv2D, MaxPooling2D
 
         model = Sequential()
 
@@ -332,23 +336,22 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         # why? isn't this adding two layers where the rd is none case only adds one?
         # and why was the input shape here still 784? It could be wrong, but also worth thinking 
         # about what they were doing. I don't know keras very well so I can't say for sure.
-        if rd is not None:
-            model.add(Conv2D(32, (5, 5),
-                         input_shape=(rd, 1)))
-        else:
-            model.add(Conv2D(32, (5, 5),
-                         input_shape=(784, 1)))
-
         model.add(Conv2D(32, (5, 5),
-                         input_shape=(28, 28, 1)))
+                         input_shape=(28,28, 1)))
+
+        model.add(Conv2D(32, (5, 5)))
+        #after this we should have input volume of size 24x24
         model.add(Activation('relu'))
         model.add(Conv2D(32, (5, 5)))
+        #20x20
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        
+        #10x10
         model.add(Conv2D(64, (5, 5)))
+        #6x6
         model.add(Activation('relu'))
         model.add(Conv2D(64, (5, 5)))
+        
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         
