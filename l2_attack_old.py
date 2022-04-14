@@ -177,7 +177,7 @@ class CarliniL2:
 
 			# TODO: Initializes weights to param_values
 			self.model.set_weights(param_values)
-
+		
 			batch = imgs[:batch_size]
 			batchlab = labs[:batch_size]
 

@@ -96,7 +96,7 @@ def acc_calc(X_adv, y, validator, indexer, confidence):
     Calculate attack success and average confidence on (X_adv, y) where X_adv is
     adv. examples and y is true labels
     """
-
+    print("in acc_calc. X_adv.shape: " + str(X_adv.shape) + ", y.shape: " + str(y.shape))
     loss_i, acc_i = validator(X_adv, y)
     c_i = 100 - acc_i*100
     indices_i = indexer(X_adv, y)

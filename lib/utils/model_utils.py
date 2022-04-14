@@ -28,6 +28,7 @@ def model_creator(model_dict, data_dict, input_var, target_var, rd=None,
     n_epoch = model_dict['num_epochs']
     dataset = model_dict['dataset']
     model_name = model_dict['model_name']
+    rev_flag = model_dict['rev']
     DR = model_dict['dim_red']
     n_out = model_dict['n_out']
     no_of_dim = data_dict['no_of_dim']
@@ -58,7 +59,7 @@ def model_creator(model_dict, data_dict, input_var, target_var, rd=None,
         activation = model_dict['nonlin']
         model_dict.update({'num_epochs': num_epochs, 'rate': rate,
                            'depth': depth, 'width': width})
-        if rd is not None:
+        if rd is not None and not rev_flag:
           network = build_cnn_rd(input_var, rd)
         else:
           network = build_cnn(in_shape, n_out, input_var)
@@ -171,6 +172,10 @@ def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
         dr_alg = None
     print("dr_alg in model_setup: " + str(dr_alg))
     # Getting data parameters after dimensionality reduction
+
+    print("X_train shape: " + str(X_train.shape))
+    print("x_test shape: " + str(X_test.shape))
+    print("X_Val shape: " + str(X_val.shape))
 
     data_dict = get_data_shape(X_train, X_test, X_val)
     no_of_dim = data_dict['no_of_dim']
@@ -351,7 +356,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         #6x6
         model.add(Activation('relu'))
         model.add(Conv2D(64, (5, 5)))
-        
+
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         

@@ -106,7 +106,6 @@ def index_fn(model_predict, input_var, target_var):
 
 def val_fn(input_var, target_var, test_loss, test_acc):
     """Theano function returns total loss and accuracy"""
-
     return theano.function([input_var, target_var], [test_loss, test_acc],
                            allow_input_downcast=True)
 #------------------------------------------------------------------------------#
