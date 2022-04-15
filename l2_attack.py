@@ -48,7 +48,10 @@ class CarliniL2:
         boxmax: Maximum pixel value (default 0.5).
         """
 
-        image_size, num_channels, num_labels = model.image_size, model.num_channels, model.num_labels
+        image_size = 28
+        num_channels = 1
+        num_labels=1
+
         self.sess = sess
         self.TARGETED = targeted
         self.LEARNING_RATE = learning_rate
@@ -63,7 +66,7 @@ class CarliniL2:
 
         self.I_KNOW_WHAT_I_AM_DOING_AND_WANT_TO_OVERRIDE_THE_PRESOFTMAX_CHECK = False
 
-        shape = (batch_size,image_size,image_size,num_channels)
+        shape = (batch_size,image_size*image_size)
         
         # the variable we're going to optimize over
         modifier = tf.Variable(np.zeros(shape,dtype=np.float32))

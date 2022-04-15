@@ -277,6 +277,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
 
     rev = model_dict['rev']
     dim_red = model_dict['dim_red']
+    model_name = model_dict['model_name']
     if rd != None:
         # Doing dimensionality reduction on dataset
         print("Doing {} with rd={} over the training data".format(dim_red, rd))
@@ -329,6 +330,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         from keras.models import Sequential
         from keras.layers import Dense, Dropout, Activation, Flatten
         from keras.layers import Conv2D, MaxPooling2D
+        import tensorflow.compat.v1 as tf
 
         model = Sequential()
 
@@ -341,39 +343,46 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         # why? isn't this adding two layers where the rd is none case only adds one?
         # and why was the input shape here still 784? It could be wrong, but also worth thinking 
         # about what they were doing. I don't know keras very well so I can't say for sure.
-        model.add(Conv2D(32, (5, 5),
-                         input_shape=(28,28, 1)))
+        if (model_name=="cnn"):
+            print("cloning cnn model minus softmax layer")
+            model.add(Conv2D(32, (3, 3),
+                            input_shape=(28,28, 1)))
 
-        model.add(Conv2D(32, (5, 5)))
-        #after this we should have input volume of size 24x24
-        model.add(Activation('relu'))
-        model.add(Conv2D(32, (5, 5)))
-        #20x20
-        model.add(Activation('relu'))
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        #10x10
-        model.add(Conv2D(64, (5, 5)))
-        #6x6
-        model.add(Activation('relu'))
-        model.add(Conv2D(64, (5, 5)))
+            model.add(Conv2D(32, (3, 3)))
+            #after this we should have input volume of size 24x24
+            model.add(Activation('relu'))
+            model.add(Conv2D(32, (3, 3)))
+            #20x20
+            model.add(Activation('relu'))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
+            #10x10
+            model.add(Conv2D(64, (3, 3)))
+            #6x6
+            model.add(Activation('relu'))
+            model.add(Conv2D(64, (3, 3)))
 
-        model.add(Activation('relu'))
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        
-        model.add(Flatten())
-        model.add(Dense(200))
-        model.add(Activation('relu'))
-        model.add(Dense(200))
-        model.add(Activation('relu'))
-        model.add(Dense(10))
-        model.load_weights(restore)
+            model.add(Activation('relu'))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
+            
+            model.add(Flatten())
+            model.add(Dense(200))
+            model.add(Activation('relu'))
+            model.add(Dense(200))
+            model.add(Activation('relu'))
+            model.add(Dense(10))
 
+        elif (model_name == "mlp"):
+            print("cloning MLP model minus final softmax layer")
+            model.add(Dense(100, activation='sigmoid', input_shape=(784,)))
+            model.add(Dense(100, activation='sigmoid'))
+            model.add(Dense(10, activation=None))
 
         if rd is not None:
             A = gradient_transform(model_dict, dr_alg)
             param_values = [A.T] + param_values
 
-        # model.set_weights(param_values)
+        model.set_weights(param_values)
+        model.predict = tf.function(model.predict)
         # m_path = './keras/' + get_model_name(model_dict, rd)
         # model.save(m_path)
         # model.load_weights(m_path)
@@ -389,7 +398,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         mean_flat = mean.reshape(-1, 784)
 
         # l2-Carlini Attack
-        import tensorflow as tf
+        import tensorflow.compat.v1 as tf
         import time
         from l2_attack import CarliniL2
 
