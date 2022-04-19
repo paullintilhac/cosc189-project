@@ -329,7 +329,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         from keras.models import Sequential
         from keras.layers import Dense, Dropout, Activation, Flatten
         from keras.layers import Conv2D, MaxPooling2D
-
+          
         model = Sequential()
 
         # paul note: this is what makes sense to me for handling the rd is none and not none cases,
@@ -341,6 +341,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         # why? isn't this adding two layers where the rd is none case only adds one?
         # and why was the input shape here still 784? It could be wrong, but also worth thinking 
         # about what they were doing. I don't know keras very well so I can't say for sure.
+
         model.add(Conv2D(32, (5, 5),padding = "same",
                          input_shape=(28,28, 1)))
 
@@ -359,13 +360,25 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         
-        model.add(Flatten())
         model.add(Dense(200))
         model.add(Activation('relu'))
         model.add(Dense(200))
         model.add(Activation('relu'))
         model.add(Dense(10))
-        model.load_weights(restore)
+        print("saheps")
+        print(type(param_values))
+        new_weights=[]
+      
+        for i in range(len(param_values)):
+            print("param value shape: " + str(param_values[i].shape))
+            if (len(param_values[i].shape)==4):
+                temp_weight =np.transpose(param_values[i],axes = [2,3,1,0])
+            else: temp_weight = param_values[i]
+            print("temp weight shape: " + str(temp_weight.shape))
+            new_weights.append(temp_weight)
+
+            
+        model.set_weights(new_weights)      
 
 
         if rd is not None:
@@ -392,72 +405,54 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         import time
         from l2_attack import CarliniL2
 
-        with tf.Session() as sess:
-            attack = CarliniL2(sess, model, batch_size=10,
-                               max_iterations=1000, confidence=0, targeted=False)
+        with tf.compat.v1.Session() as sess:
+            attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0)
+            #attack = CarliniL0(sess, model, max_iterations=1000, initial_const=10,
+            #                   largest_const=15)
 
-            inputs, targets = generate_data(data, samples=10000, targeted=False,
+            inputs, targets = generate_data(data, samples=1, targeted=True,
                                             start=0, inception=False)
             timestart = time.time()
-            adv = attack.attack(inputs, targets, param_values)
+            adv = attack.attack(inputs, targets)
             timeend = time.time()
+            
+            print("Took",timeend-timestart,"seconds to run",len(inputs),"samples.")
 
-            print("Took", timeend - timestart,
-                  "seconds to run", len(inputs), "samples.")
-
-            # Resolve absolute path to output directory
-            abs_path_o = resolve_path_o(model_dict)
-
-            fname = 'carlini_l2'
-            fname += '_' + get_model_name(model_dict)
-
-            if rd is not None:
-                fname += '_' + model_dict['dim_red'] + str(rd)
-
-            plotfile = open(abs_path_o + fname + '.txt', 'a')
-            plotfile.write('\\\small{' + str(rd) + '}\n')
-
-            dists = []
-            pred = model.predict(inputs + 0.5 - mean_flat)
             for i in range(len(adv)):
-                dist = np.linalg.norm((adv[i] + mean_flat) - (inputs[i] + 0.5))
-                if np.argmax(pred[i]) == y_test[i]:
-                    dists.append(dist)
-                if i < 50:
-                    # Save original test and adversarial images
-                    x_adv = (adv[i] + mean_flat).reshape((28, 28))
-                    orig = (inputs[i] + 0.5).reshape((28, 28))
-                    img.imsave('./carlini_images/{}_adv.png'.format(i),
-                               x_adv * 255, vmin=0, vmax=255, cmap='gray')
-                    img.imsave('./carlini_images/{}_orig.png'.format(i),
-                               orig * 255, vmin=0, vmax=255, cmap='gray')
+                print("Valid:")
+                show(inputs[i])
+                print("Adversarial:")
+                show(adv[i])
+                
+                print("Classification:", model.model.predict(adv[i:i+1]))
 
-            # Test overall accuracy of the model
-            pred = model.predict(inputs + 0.5 - mean_flat)
-            correct = 0
-            for i in range(pred.shape[0]):
-                if np.argmax(pred[i]) == y_test[i]:
-                    correct += 1
-            print('Overall accuracy on test images: ',
-                  correct / float(pred.shape[0]))
+                print("Total distortion:", np.sum((adv[i]-inputs[i])**2)**.5)
+                # Test overall accuracy of the model
+                pred = model.predict(inputs + 0.5 - mean_flat)
+                correct = 0
+                for i in range(pred.shape[0]):
+                    if np.argmax(pred[i]) == y_test[i]:
+                        correct += 1
+                print('Overall accuracy on test images: ',
+                    correct / float(pred.shape[0]))
 
-            pred = model.predict(adv)
-            correct = 0
-            for i in range(pred.shape[0]):
-                if np.argmax(pred[i]) == y_test[i]:
-                    correct += 1
-            print('Overall accuracy on adversarial images: ',
-                  correct / float(pred.shape[0]))
+                pred = model.predict(adv)
+                correct = 0
+                for i in range(pred.shape[0]):
+                    if np.argmax(pred[i]) == y_test[i]:
+                        correct += 1
+                print('Overall accuracy on adversarial images: ',
+                    correct / float(pred.shape[0]))
 
-            dists_sorted = sorted(dists)
+                dists_sorted = sorted(dists)
 
-            for i in range(len(dists)):
-                plotfile.write('{} {} \n'.format(i, dists_sorted[i]))
+                for i in range(len(dists)):
+                    plotfile.write('{} {} \n'.format(i, dists_sorted[i]))
 
-            # Plot histogram
-            # import matplotlib.pyplot as plt
-            # dists = np.array(dists)
-            # ax.hist(dists, 50, normed=1, histtype='step', cumulative=True,label=str(rd))
+                # Plot histogram
+                # import matplotlib.pyplot as plt
+                # dists = np.array(dists)
+                # ax.hist(dists, 50, normed=1, histtype='step', cumulative=True,label=str(rd))
 
 
     elif model_exist_flag == 0:
