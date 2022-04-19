@@ -341,21 +341,20 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         # why? isn't this adding two layers where the rd is none case only adds one?
         # and why was the input shape here still 784? It could be wrong, but also worth thinking 
         # about what they were doing. I don't know keras very well so I can't say for sure.
-        model.add(Conv2D(32, (5, 5),
+        model.add(Conv2D(32, (5, 5),padding = "same",
                          input_shape=(28,28, 1)))
 
-        model.add(Conv2D(32, (5, 5)))
         #after this we should have input volume of size 24x24
         model.add(Activation('relu'))
-        model.add(Conv2D(32, (5, 5)))
+        model.add(Conv2D(32, (5, 5),padding = "same"))
         #20x20
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         #10x10
-        model.add(Conv2D(64, (5, 5)))
+        model.add(Conv2D(64, (5, 5),padding = "same"))
         #6x6
         model.add(Activation('relu'))
-        model.add(Conv2D(64, (5, 5)))
+        model.add(Conv2D(64, (5, 5),padding = "same"))
 
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
