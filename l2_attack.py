@@ -48,7 +48,9 @@ class CarliniL2:
         boxmax: Maximum pixel value (default 0.5).
         """
 
-        image_size, num_channels, num_labels = model.image_size, model.num_channels, model.num_labels
+        image_size = 28
+        num_channels = 1
+        num_labels = 10 
         self.sess = sess
         self.TARGETED = targeted
         self.LEARNING_RATE = learning_rate

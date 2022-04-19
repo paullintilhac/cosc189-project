@@ -233,7 +233,7 @@ def build_cnn_rd(input_var, rd):
     # Input layer, as usual:
     network = lasagne.layers.InputLayer(shape=(None, 1, rd),
                                         input_var=input_var)
-
+    
     # 2 Convolutional layers with 32 kernels of size 5x5.
     network = lasagne.layers.Conv1DLayer(
         network, num_filters=32, filter_size=5,
