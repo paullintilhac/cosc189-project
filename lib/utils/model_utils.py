@@ -326,10 +326,16 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         #lasagne.layers.set_all_param_values(network, param_values)
 
         # Create Keras model
-        from keras.models import Sequential
-        from keras.layers import Dense, Dropout, Activation, Flatten
-        from keras.layers import Conv2D, MaxPooling2D
-          
+        from tensorflow.compat.v1.keras.models import Sequential
+        from tensorflow.compat.v1.keras.layers import Dense, Dropout, Activation, Flatten
+        from tensorflow.compat.v1.keras.layers import Conv2D, MaxPooling2D
+        import tensorflow.compat.v1 as tf
+        import time
+        from l2_attack import CarliniL2
+        tf.compat.v1.disable_eager_execution()
+
+
+
         model = Sequential()
 
         # paul note: this is what makes sense to me for handling the rd is none and not none cases,
@@ -377,9 +383,8 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
             print("temp weight shape: " + str(temp_weight.shape))
             new_weights.append(temp_weight)
 
-            
-        model.set_weights(new_weights)      
 
+        model.set_weights(new_weights)      
 
         if rd is not None:
             A = gradient_transform(model_dict, dr_alg)
@@ -401,11 +406,10 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         mean_flat = mean.reshape(-1, 784)
 
         # l2-Carlini Attack
-        import tensorflow as tf
-        import time
-        from l2_attack import CarliniL2
+        
+        print("executing eagerly? " + str(tf.executing_eagerly()))
 
-        with tf.compat.v1.Session() as sess:
+        with tf.Session() as sess:
             attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0)
             #attack = CarliniL0(sess, model, max_iterations=1000, initial_const=10,
             #                   largest_const=15)
