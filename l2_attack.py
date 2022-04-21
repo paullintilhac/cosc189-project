@@ -7,6 +7,8 @@
 
 import sys
 import tensorflow.compat.v1 as tf
+from tensorflow.compat.v1.keras.backend import get_session
+
 import numpy as np
 
 BINARY_SEARCH_STEPS = 9  # number of times to adjust the constant with binary search
@@ -47,7 +49,8 @@ class CarliniL2:
         boxmin: Minimum pixel value (default -0.5).
         boxmax: Maximum pixel value (default 0.5).
         """
-
+        #sess = get_session()
+        
         image_size = 28
         num_channels = 1
         num_labels = 10 
@@ -84,9 +87,14 @@ class CarliniL2:
         self.boxmul = (boxmax - boxmin) / 2.
         self.boxplus = (boxmin + boxmax) / 2.
         self.newimg = tf.tanh(modifier + self.timg) * self.boxmul + self.boxplus
-        
+
+        # initialize symbolic variables
+        init = tf.global_variables_initializer()
+        sess.run(init)
+        print("newImg: " +str(self.newimg))
+        print("newImg size: " + str(self.newimg.shape))
         # prediction BEFORE-SOFTMAX of the model
-        self.output = model.predict(self.newimg)
+        self.output = model.predict(self.newimg,steps=9)
         
         # distance to the input data
         self.l2dist = tf.reduce_sum(tf.square(self.newimg-(tf.tanh(self.timg) * self.boxmul + self.boxplus)),[1,2,3])

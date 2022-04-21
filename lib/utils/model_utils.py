@@ -329,6 +329,8 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         from tensorflow.compat.v1.keras.models import Sequential
         from tensorflow.compat.v1.keras.layers import Dense, Dropout, Activation, Flatten
         from tensorflow.compat.v1.keras.layers import Conv2D, MaxPooling2D
+        from tensorflow.compat.v1.keras.backend import set_session
+
         import tensorflow.compat.v1 as tf
         import time
         from l2_attack import CarliniL2
@@ -410,6 +412,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         print("executing eagerly? " + str(tf.executing_eagerly()))
 
         with tf.Session() as sess:
+            set_session(sess)
             attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0)
             #attack = CarliniL0(sess, model, max_iterations=1000, initial_const=10,
             #                   largest_const=15)
