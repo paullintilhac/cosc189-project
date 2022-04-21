@@ -7,8 +7,6 @@
 
 import sys
 import tensorflow.compat.v1 as tf
-from tensorflow.compat.v1.keras.backend import get_session
-
 import numpy as np
 
 BINARY_SEARCH_STEPS = 9  # number of times to adjust the constant with binary search
@@ -49,7 +47,6 @@ class CarliniL2:
         boxmin: Minimum pixel value (default -0.5).
         boxmax: Maximum pixel value (default 0.5).
         """
-        #sess = get_session()
         
         image_size = 28
         num_channels = 1
