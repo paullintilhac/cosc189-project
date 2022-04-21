@@ -96,8 +96,11 @@ class CarliniL2:
         # distance to the input data
         self.l2dist = tf.reduce_sum(tf.square(self.newimg-(tf.tanh(self.timg) * self.boxmul + self.boxplus)),[1,2,3])
         
+        print("tlab: " + str(self.tlab))
+        print("output: " + str(self.output.shape))
+
         # compute the probability of the label class versus the maximum other
-        real = tf.reduce_sum((self.tlab)*self.output,1)
+        real = tf.reduce_sum((self.tlab)*tf.convert_to_tensor(self.output),1)
         other = tf.reduce_max((1-self.tlab)*self.output - (self.tlab*10000),1)
 
         if self.TARGETED:
