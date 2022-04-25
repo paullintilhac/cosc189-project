@@ -31,7 +31,7 @@ def main(argv):
     batchsize = 500                         # Fixing batchsize
     no_of_mags = 1       # No. of deviations to consider
     dev_list = np.linspace(2, 2, no_of_mags)
-
+    
     # Create model_dict from arguments
     model_dict = model_dict_create()
     print("model dict in run_defense: " + str(model_dict))

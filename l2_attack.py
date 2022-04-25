@@ -47,10 +47,8 @@ class CarliniL2:
         boxmin: Minimum pixel value (default -0.5).
         boxmax: Maximum pixel value (default 0.5).
         """
-        
-        image_size = 28
-        num_channels = 1
-        num_labels = 10 
+
+        image_size, num_channels, num_labels = model.image_size, model.num_channels, model.num_labels
         self.sess = sess
         self.TARGETED = targeted
         self.LEARNING_RATE = learning_rate
@@ -84,23 +82,15 @@ class CarliniL2:
         self.boxmul = (boxmax - boxmin) / 2.
         self.boxplus = (boxmin + boxmax) / 2.
         self.newimg = tf.tanh(modifier + self.timg) * self.boxmul + self.boxplus
-
-        # initialize symbolic variables
-        init = tf.global_variables_initializer()
-        sess.run(init)
-        print("newImg: " +str(self.newimg))
-        print("newImg size: " + str(self.newimg.shape))
+        
         # prediction BEFORE-SOFTMAX of the model
-        self.output = model.predict(self.newimg,steps=9)
+        self.output = model.predict(self.newimg)
         
         # distance to the input data
         self.l2dist = tf.reduce_sum(tf.square(self.newimg-(tf.tanh(self.timg) * self.boxmul + self.boxplus)),[1,2,3])
         
-        print("tlab: " + str(self.tlab))
-        print("output: " + str(self.output.shape))
-
         # compute the probability of the label class versus the maximum other
-        real = tf.reduce_sum((self.tlab)*tf.convert_to_tensor(self.output),1)
+        real = tf.reduce_sum((self.tlab)*self.output,1)
         other = tf.reduce_max((1-self.tlab)*self.output - (self.tlab*10000),1)
 
         if self.TARGETED:

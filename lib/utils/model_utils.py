@@ -149,6 +149,55 @@ def model_saver(network, model_dict, rd=None):
 
     np.savez(model_path + '.npz', *lasagne.layers.get_all_param_values(network))
 #------------------------------------------------------------------------------#
+def model_setup_keras(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
+                rd=None, layer=None):
+    """
+    Main function to set up network (create, load, test, save)
+    """
+    print("setting up model")
+    #print(str(model_dict))
+    rev = model_dict['rev']
+    dim_red = model_dict['dim_red']
+    small = model_dict['small']
+    gamma = model_dict['gamma']
+    kernel = model_dict['kernel']
+    print("rd in model_setup: " + str(rd))
+    if rd:
+        # Doing dimensionality reduction on dataset
+        print("Doing {} with rd={} over the training data".format(dim_red, rd))
+        X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small, gamma, kernel)
+    else:
+        dr_alg = None
+    print("dr_alg in model_setup: " + str(dr_alg))
+    # Getting data parameters after dimensionality reduction
+
+    print("X_train shape: " + str(X_train.shape))
+    print("x_test shape: " + str(X_test.shape))
+    print("X_Val shape: " + str(X_val.shape))
+
+    data_dict = get_data_shape(X_train, X_test, X_val)
+    no_of_dim = data_dict['no_of_dim']
+
+    # Prepare Theano variables for inputs and targets
+    if no_of_dim == 2:
+        input_var = T.matrix('inputs')
+    elif no_of_dim == 3:
+        input_var = T.tensor3('inputs')
+    elif no_of_dim == 4:
+        input_var = T.tensor4('inputs')
+    target_var = T.ivector('targets')
+
+    model =  MNISTModel("models/mnist", sess)
+
+    # Defining symbolic variable for network output
+    test_prediction = model.predict()
+    # Evaluating on retrained inputs
+    test_model_eval(model_dict, input_var, target_var, test_prediction,
+                    X_test, y_test, rd)
+
+    return data_dict, test_prediction, dr_alg, X_test, input_var, target_var
+#------------------------------------------------------------------------------#
+
 
 
 def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
@@ -320,8 +369,11 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         # Load the correct model:
         param_values = model_loader(model_dict, rd)
 
+
         print("param values shape: " + str(len(param_values)))
-        print("param values[0] shape: " + str(len(param_values[0])))
+        for i in range(len(param_values)):
+            print("param values["+str(i)+"] shape: " + str(len(param_values[i])))
+
 
         #lasagne.layers.set_all_param_values(network, param_values)
 
@@ -339,50 +391,37 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
 
 
         model = Sequential()
-
-        # paul note: this is what makes sense to me for handling the rd is none and not none cases,
-        # but it doesn't actually mirror the original code for bhagoji. 
-        # that code has two lines for the rd is not none case it looked like this:
-        #   model.add(Dense(rd, activation=None,
-        #                    input_shape=(784,), use_bias=False))
-        #    model.add(Dense(100, activation='sigmoid'))
-        # why? isn't this adding two layers where the rd is none case only adds one?
-        # and why was the input shape here still 784? It could be wrong, but also worth thinking 
-        # about what they were doing. I don't know keras very well so I can't say for sure.
-
         model.add(Conv2D(32, (5, 5),padding = "same",
                          input_shape=(28,28, 1)))
 
         #after this we should have input volume of size 24x24
         model.add(Activation('relu'))
         model.add(Conv2D(32, (5, 5),padding = "same"))
-        #20x20
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        #10x10
         model.add(Conv2D(64, (5, 5),padding = "same"))
-        #6x6
         model.add(Activation('relu'))
         model.add(Conv2D(64, (5, 5),padding = "same"))
-
         model.add(Activation('relu'))
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        
+        model.add(Flatten(MaxPooling2D(pool_size=(2, 2))))
         model.add(Dense(200))
         model.add(Activation('relu'))
         model.add(Dense(200))
         model.add(Activation('relu'))
         model.add(Dense(10))
-        print("saheps")
+
+        print("output: " +str(model.summary()))
+        print("last layer output: " + str(model.layers[len(model.layers)-1].output))
+
         print(type(param_values))
         new_weights=[]
       
         for i in range(len(param_values)):
-            print("param value shape: " + str(param_values[i].shape))
+            #print("param value shape: " + str(param_values[i].shape))
             if (len(param_values[i].shape)==4):
                 temp_weight =np.transpose(param_values[i],axes = [2,3,1,0])
             else: temp_weight = param_values[i]
-            print("temp weight shape: " + str(temp_weight.shape))
+            #print("temp weight shape: " + str(temp_weight.shape))
             new_weights.append(temp_weight)
 
 
