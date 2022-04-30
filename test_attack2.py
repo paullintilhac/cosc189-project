@@ -94,13 +94,16 @@ if __name__ == "__main__":
         data = (X_test, y_onehot)
 
         #data, model =  CIFAR(), CIFARModel("models/cifar", sess)
-        attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0)
+        attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0, targeted=False)
         #attack = CarliniL0(sess, model, max_iterations=1000, initial_const=10,
         #                   largest_const=15)
 
-        inputs, targets = generate_data(data, samples=1, targeted=False,
+        inputs, targets = generate_data(data, samples=9, targeted=False,
                                         start=0, inception=False)
+
         print("shape of inputs: " + str(inputs.shape) + ", shape of targets: " + str(targets.shape))
+        print("targets: " + str(targets))
+
         timestart = time.time()
         adv = attack.attack(inputs, targets)
         timeend = time.time()
