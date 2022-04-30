@@ -62,8 +62,10 @@ def generate_data(data, samples, targeted=True, start=0, inception=False):
 if __name__ == "__main__":
     with tf.Session() as sess:
         data, model =  MNIST(), MNISTModel("models/mnist", sess)
-        print("data[0] range: (" + str(np.min(data[0]))+","+str(np.max(data[0]))+")")
-
+        test_data = data.test_data
+        print("first image shape: " + str(test_data[0].shape))
+        print(" min: " + str(np.min(test_data[0])))
+        print(" max: " + str(np.max(test_data[0])))
         #data, model =  CIFAR(), CIFARModel("models/cifar", sess)
         attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0)
         #attack = CarliniL0(sess, model, max_iterations=1000, initial_const=10,

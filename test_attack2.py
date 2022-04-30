@@ -63,8 +63,11 @@ if __name__ == "__main__":
         no_of_dim = data_dict['no_of_dim']
 
 
-        X_test = np.transpose(X_test,axes = [0,2,3,1])
+        X_test = np.transpose(X_test,axes = [0,2,3,1])-.5
 
+        print(" first image shape: " + str(X_test[0].shape))
+        print(" min: " + str(np.min(X_test[0])))
+        print(" max: " + str(np.max(X_test[0])))
         y_onehot = np.zeros((len(y_test), 10))
         y_onehot[np.arange(len(y_test)), y_test] = 1
         

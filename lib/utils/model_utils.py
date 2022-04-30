@@ -353,8 +353,12 @@ def model_setup_keras(model_dict, X_train, y_train, X_test, y_test, X_val, y_val
         
 
         data = (X_test-.5, y_onehot)
-        print("X_test range: (" + str(np.min(data[0]))+","+str(np.max(data[0]))+")")
+        print("X_test min: " + str(np.min(data[0])))
+        print("X_test max: " + str(np.max(data[0])))
         inputs, targets = generate_data(data, samples=10000, targeted=False, start=0, inception=False)
+        print("inputs min: " + str(np.min(inputs)))
+        print("inputs max: " + str(np.max(inputs)))
+
         print("inputs[0] shape: " + str(inputs[0].shape))
         print("targets[0] shape: " + str(targets[0].shape))
         timestart = time.time()
