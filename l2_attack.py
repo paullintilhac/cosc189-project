@@ -109,7 +109,6 @@ class CarliniL2:
         start_vars = set(x.name for x in tf.global_variables())
         optimizer = tf.train.AdamOptimizer(self.LEARNING_RATE)
         self.train = optimizer.minimize(self.loss, var_list=[modifier])
-        print("self.train : " + str(self.train))
         end_vars = tf.global_variables()
         new_vars = [x for x in end_vars if x.name not in start_vars]
 
@@ -140,7 +139,6 @@ class CarliniL2:
         """
         Run the attack on a batch of images and labels.
         """
-        print("imgs[0]==imgs[1]?: " + str(np.array_equal(imgs[0],imgs[1])))
         def compare(x,y):
             if not isinstance(x, (float, int, np.int64)):
                 x = np.copy(x)

@@ -1,11 +1,10 @@
 import tensorflow.compat.v1 as tf
 import numpy as np
 import time
-
 from setup_mnist import MNIST, MNISTModel
 from lib.utils.data_utils import *
-
 from l2_attack import CarliniL2
+import csv
 
 
 
@@ -47,6 +46,7 @@ def generate_data(data, samples, targeted=True, start=0, inception=False):
 
 if __name__ == "__main__":
     with tf.Session() as sess:
+        model =  MNISTModel("models/mnist", sess)
         # Create model_dict from arguments
         model_dict = model_dict_create()
         print("model dict in run_defense: " + str(model_dict))
@@ -55,8 +55,14 @@ if __name__ == "__main__":
         print('Loading data...')
         dataset = model_dict['dataset']
         keras = model_dict['keras']
-        
-        model =  MNISTModel("models/mnist", sess)
+        rev = model_dict['rev']
+        dim_red = model_dict['dim_red']
+        small = model_dict['small']
+        gamma = model_dict['gamma']
+        kernel = model_dict['kernel']
+        rd = model_dict["num_dims"]
+        print("rd in model_setup: " + str(rd))
+    
 
         X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(model_dict)
         data_dict = get_data_shape(X_train, X_test, X_val)
@@ -102,16 +108,35 @@ if __name__ == "__main__":
                                         start=0, inception=False)
 
         print("shape of inputs: " + str(inputs.shape) + ", shape of targets: " + str(targets.shape))
-        print("targets: " + str(targets))
+        #print("targets: " + str(targets))
 
         timestart = time.time()
         adv = attack.attack(inputs, targets)
         timeend = time.time()
         
-        distortion = (adv - inputs)**2
+        distortion = np.sum((adv - inputs)**2,axis=(1,2,3))**.5
+        print("distortion shape: " + str(distortion.shape))
+        
         sorted_distortion = np.sort(distortion)
         attacked_predictions = model.model.predict(adv)
         attacked_prediction_array = tf.math.argmax(attacked_predictions,axis=1).eval()
 
         attacked_accuracy = np.mean(attacked_prediction_array == y_test)
+        max_distortion = np.max(distortion)
+        mean_distortion = np.mean(distortion)
         print("attacked_accuracy: " + str(attacked_accuracy))
+        print("max distortion: " + str(max_distortion))
+        print("mean distortion: " + str(mean_distortion))
+
+        with open('sorted_distortions.csv', 'w', newline='') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=' ',
+                                    quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            for i in range(len(sorted_distortion)):
+                spamwriter.writerow([i]  + [sorted_distortion[i]])
+
+        if rd:
+            # Doing dimensionality reduction on dataset
+            print("Doing {} with rd={} over the training data".format(dim_red, rd))
+            X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small, gamma, kernel)
+        else:
+            dr_alg = None
