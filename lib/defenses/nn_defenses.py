@@ -126,6 +126,7 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
             X_adv = reshape_data(X_adv, data_dict, rd)
             output_list.append(acc_calc_all(X_adv, y_test, X_test, i_c, validator, indexer, predictor, confidence))
 
+        print("X_adv_rev shape: " + str(X_adv_rev.shape))
         print("output_list: " + str(output_list))
         print("  test accuracy:\t\t{:.2f} %".format(100.0-output_list[0][4]))
 

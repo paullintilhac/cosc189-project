@@ -7,8 +7,8 @@ import tensorflow.compat.v1 as tf
 from tensorflow.compat.v1.keras.backend import set_session
 import time
 import numpy as np
-tf.disable_v2_behavior()
-tf.disable_eager_execution()
+#tf.disable_v2_behavior()
+#tf.disable_eager_execution()
 
 model_path ="/Users/paullintilhac/defense_research/cosc189-project/nn_models/MNIST/cnn_9_papernotsigmoid"
 

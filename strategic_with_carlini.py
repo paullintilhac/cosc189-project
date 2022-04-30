@@ -51,7 +51,7 @@ def main():
 
     # fig, ax = plt.subplots(nrows=1, ncols=1)
     for rd in rd_list:
-        model_setup_carlini(rd,model_dict, X_train, y_train, X_test, y_test, X_val, y_val,mean)
+        model_setup_keras(rd,model_dict, X_train, y_train, X_test, y_test, X_val, y_val,mean)
 
     
     # dim_red = model_dict['dim_red']

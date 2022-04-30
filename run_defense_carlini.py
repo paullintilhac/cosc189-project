@@ -4,8 +4,7 @@ import os
 import time
 
 import numpy as np
-import theano
-import theano.tensor as T
+
 
 import lasagne
 from sklearn.decomposition import PCA
@@ -15,6 +14,7 @@ from lib.utils.data_utils import *
 from lib.utils.model_utils import *
 from lib.attacks.nn_attacks import *
 from lib.defenses.nn_defenses import *
+
 
 #-----------------------------------------------------------------------------#
 
@@ -55,50 +55,29 @@ def main(argv):
         rd_list = [561, 200, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
         X_val = None
         y_val = None
-
-    # Center data by subtracting mean of training set
-    mean = np.mean(X_train, axis=0)
-    X_train -= mean
-    X_test -= mean
-    if (dataset == 'MNIST') or (dataset == 'GTSRB'):
-        X_val -= mean
-
-    print("running model setup")
-
-    data_dict, test_prediction, dr_alg, X_test, input_var, target_var = \
-        model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val)
     
-    print("test prediction: " + str(test_prediction))
-    # print_output(model_dict, output_list, dev_list)
-    # save_images(model_dict, data_dict, X_test, adv_x_ini, dev_list)
+    print("X_test shape: " + str(X_test.shape))
+    print("X_test[0] == X_test[1]? " + str(np.array_equal(X_test[0],X_test[1])))
+    print("running model setup")
+    data_dict, test_prediction, dr_alg, X_test, input_var, target_var, sorted_distortions, attacked_predictions = \
+        model_setup_keras(model_dict, X_train, y_train, X_test, y_test, X_val, y_val)
+
+
+    import csv
+    with open('sorted_distortions.csv', 'w', newline='') as csvfile:
+        spamwriter = csv.writer(csvfile, delimiter=' ',
+                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        for i in range(len(sorted_distortions)):
+            spamwriter.writerow([i]  + [sorted_distortions[i]])
+
+    print("correct output shape: " + str(y_test.shape))
 
     layer_flag = None
-    
-
-    
-    print("using defense "+str(model_dict['defense']))
-    # Run defense
-    defense = model_dict['defense']
     
     for rd in rd_list:
         print ("Starting strategic attack...")
         
-        adv_x_ini, output_list = attack_wrapper(model_dict, data_dict, input_var,
-                target_var, test_prediction, dev_list, X_test, y_test, mean,
-                                        dr_alg, rd)
-        print("output_list: " + str(output_list))
-        print_output(model_dict, output_list, dev_list, False, rd)
         
-        if defense == 'recons':
-            recons_defense(model_dict, data_dict, input_var, target_var,
-                            test_prediction, dev_list, adv_x_ini, rd,
-                            X_train, y_train, X_test, y_test)
-        elif defense == 'retrain':
-            retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train,
-                            y_train, X_test, y_test, X_val, y_val)
-        else: 
-            print("not using defense -- only strategic attack")
-            continue
 
 #-----------------------------------------------------------------------------#
 

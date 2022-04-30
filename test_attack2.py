@@ -1,34 +1,18 @@
-## test_attack.py -- sample code to test attack procedure
-##
-## Copyright (C) 2016, Nicholas Carlini <nicholas@carlini.com>.
-##
-## This program is licenced under the BSD 2-Clause licence,
-## contained in the LICENCE file in this directory.
-
 import tensorflow.compat.v1 as tf
 import numpy as np
 import time
 
 from setup_mnist import MNIST, MNISTModel
+from lib.utils.data_utils import *
 
 from l2_attack import CarliniL2
 
-
-def show(img):
-    """
-    Show MNSIT digits in the console.
-    """
-    remap = "  .*#"+"#"*100
-    img = (img.flatten()+.5)*3
-    if len(img) != 784: return
-    print("START")
-    for i in range(28):
-        print("".join([remap[int(round(x))] for x in img[i*28:i*28+28]]))
 
 
 def generate_data(data, samples, targeted=True, start=0, inception=False):
     """
     Generate the input data to the attack algorithm.
+
     data: the images to attack
     samples: number of samples to use
     targeted: if true, construct targeted attacks, otherwise untargeted attacks
@@ -40,29 +24,51 @@ def generate_data(data, samples, targeted=True, start=0, inception=False):
     for i in range(samples):
         if targeted:
             if inception:
-                seq = random.sample(range(1,1001), 10)
+                seq = random.sample(range(1, 1001), 10)
             else:
-                seq = range(data.test_labels.shape[1])
+                seq = range(data[1].shape[1])
 
             for j in seq:
-                if (j == np.argmax(data.test_labels[start+i])) and (inception == False):
+                if (j == np.argmax(data[1][start + i])) and (inception == False):
                     continue
-                inputs.append(data.test_data[start+i])
-                targets.append(np.eye(data.test_labels.shape[1])[j])
+                inputs.append(data[0][start + i])
+                targets.append(np.eye(data[1].shape[1])[j])
         else:
-            inputs.append(data.test_data[start+i])
-            targets.append(data.test_labels[start+i])
+            inputs.append(data[0][start + i])
+            targets.append(data[1][start + i])
 
     inputs = np.array(inputs)
     targets = np.array(targets)
 
     return inputs, targets
+#------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------#
 
 
 if __name__ == "__main__":
     with tf.Session() as sess:
-        data, model =  MNIST(), MNISTModel("models/mnist", sess)
-        print("data[0] range: (" + str(np.min(data[0]))+","+str(np.max(data[0]))+")")
+        # Create model_dict from arguments
+        model_dict = model_dict_create()
+        print("model dict in run_defense: " + str(model_dict))
+        # print("model dict: " + str(model_dict))
+        # Load and parse specified dataset into numpy arrays
+        print('Loading data...')
+        dataset = model_dict['dataset']
+        keras = model_dict['keras']
+        
+        model =  MNISTModel("models/mnist", sess)
+
+        X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(model_dict)
+        data_dict = get_data_shape(X_train, X_test, X_val)
+        no_of_dim = data_dict['no_of_dim']
+
+
+        X_test = np.transpose(X_test,axes = [0,2,3,1])
+
+        y_onehot = np.zeros((len(y_test), 10))
+        y_onehot[np.arange(len(y_test)), y_test] = 1
+        
+        data = (X_test, y_onehot)
 
         #data, model =  CIFAR(), CIFARModel("models/cifar", sess)
         attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0)

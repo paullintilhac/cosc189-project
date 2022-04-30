@@ -13,6 +13,7 @@ from lib.utils.data_utils import *
 from lib.utils.lasagne_utils import *
 from lib.utils.theano_utils import *
 from lib.utils.dr_utils import *
+from setup_mnist import MNISTModel
 
 #------------------------------------------------------------------------------#
 
@@ -148,56 +149,6 @@ def model_saver(network, model_dict, rd=None):
     model_path = abs_path_m + mname
 
     np.savez(model_path + '.npz', *lasagne.layers.get_all_param_values(network))
-#------------------------------------------------------------------------------#
-def model_setup_keras(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
-                rd=None, layer=None):
-    """
-    Main function to set up network (create, load, test, save)
-    """
-    print("setting up model")
-    #print(str(model_dict))
-    rev = model_dict['rev']
-    dim_red = model_dict['dim_red']
-    small = model_dict['small']
-    gamma = model_dict['gamma']
-    kernel = model_dict['kernel']
-    print("rd in model_setup: " + str(rd))
-    if rd:
-        # Doing dimensionality reduction on dataset
-        print("Doing {} with rd={} over the training data".format(dim_red, rd))
-        X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small, gamma, kernel)
-    else:
-        dr_alg = None
-    print("dr_alg in model_setup: " + str(dr_alg))
-    # Getting data parameters after dimensionality reduction
-
-    print("X_train shape: " + str(X_train.shape))
-    print("x_test shape: " + str(X_test.shape))
-    print("X_Val shape: " + str(X_val.shape))
-
-    data_dict = get_data_shape(X_train, X_test, X_val)
-    no_of_dim = data_dict['no_of_dim']
-
-    # Prepare Theano variables for inputs and targets
-    if no_of_dim == 2:
-        input_var = T.matrix('inputs')
-    elif no_of_dim == 3:
-        input_var = T.tensor3('inputs')
-    elif no_of_dim == 4:
-        input_var = T.tensor4('inputs')
-    target_var = T.ivector('targets')
-
-    model =  MNISTModel("models/mnist", sess)
-
-    # Defining symbolic variable for network output
-    test_prediction = model.predict()
-    # Evaluating on retrained inputs
-    test_model_eval(model_dict, input_var, target_var, test_prediction,
-                    X_test, y_test, rd)
-
-    return data_dict, test_prediction, dr_alg, X_test, input_var, target_var
-#------------------------------------------------------------------------------#
-
 
 
 def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
@@ -254,7 +205,7 @@ def model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
     params = lasagne.layers.get_all_params(network, trainable=True)
     # Defining symbolic variable for network output with dropout disabled
     test_prediction = lasagne.layers.get_output(network, deterministic=True)
-
+    print("test_prediction: " + str(test_prediction))
     # Building or loading model depending on existence
     if model_exist_flag == 1:
         # Load the correct model:
@@ -316,6 +267,108 @@ def generate_data(data, samples, targeted=True, start=0, inception=False):
 
     return inputs, targets
 #------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------#
+def model_setup_keras(model_dict, X_train, y_train, X_test, y_test, X_val, y_val, rd=None, layer=None):
+    """
+    Main function to set up network (create, load, test, save)
+    """
+    print("setting up model")
+    #print(str(model_dict))
+    rev = model_dict['rev']
+    dim_red = model_dict['dim_red']
+    small = model_dict['small']
+    gamma = model_dict['gamma']
+    kernel = model_dict['kernel']
+    print("rd in model_setup: " + str(rd))
+    if rd:
+        # Doing dimensionality reduction on dataset
+        print("Doing {} with rd={} over the training data".format(dim_red, rd))
+        X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small, gamma, kernel)
+    else:
+        dr_alg = None
+        
+    print("dr_alg in model_setup: " + str(dr_alg))
+    # Getting data parameters after dimensionality reduction
+
+    print("X_train shape: " + str(X_train.shape))
+    print("x_test shape: " + str(X_test.shape))
+    print("X_Val shape: " + str(X_val.shape))
+
+    data_dict = get_data_shape(X_train, X_test, X_val)
+    no_of_dim = data_dict['no_of_dim']
+
+    # Prepare Theano variables for inputs and targets
+    if no_of_dim == 2:
+        input_var = T.matrix('inputs')
+    elif no_of_dim == 3:
+        input_var = T.tensor3('inputs')
+    elif no_of_dim == 4:
+        input_var = T.tensor4('inputs')
+    target_var = T.ivector('targets')
+
+    # X_test was mean-subtracted before, now we add the mean back
+    ## paul note: why are we subtracting .5 here?
+    ## probably need conditional statement here to handle if rd is not none
+    X_test = np.transpose(X_test,axes = [0,2,3,1])
+
+    from tensorflow.compat.v1.keras.models import Sequential
+    from tensorflow.compat.v1.keras.layers import Dense, Dropout, Activation, Flatten
+    from tensorflow.compat.v1.keras.layers import Conv2D, MaxPooling2D
+    from tensorflow.compat.v1.keras.backend import set_session
+    from l2_attack import CarliniL2
+    import tensorflow.compat.v1 as tf
+    import tensorflow.compat.v1 as tf
+    import time
+
+    with tf.Session() as sess:
+        tf.enable_eager_execution()
+        print("executing eagerly? " + str(tf.executing_eagerly()))
+
+        model =  MNISTModel("models/mnist", sess)
+        # Defining symbolic variable for network output
+        test_prediction = model.predict(X_test)
+
+        # max_index_col = np.argmax(test_prediction, axis=0)
+        # print("max_index_col shape: " + str(max_index_col.shape))
+
+        test_prediction_array = tf.math.argmax(test_prediction,axis=1).eval()
+
+        print("executing eagerly? " + str(tf.executing_eagerly()))
+
+        print("prediction shape: " + str(test_prediction.shape))        
+        print("y_test_shape: " + str(y_test.shape))
+        print("first prediction: " + str(test_prediction[0].eval()))
+        print("first label: " + str(y_test[0]))
+        print("test_prediction_array shape:  " + str(test_prediction_array.shape))
+        print("test_prediction_array[0]: " + str(test_prediction_array[0]))
+
+        accuracy = np.mean(test_prediction_array == y_test)
+        print("unattacked test accuracy: " + str(accuracy))
+
+
+        attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0)
+
+        y_onehot = np.zeros((len(y_test), 10))
+        y_onehot[np.arange(len(y_test)), y_test] = 1
+        
+
+        data = (X_test-.5, y_onehot)
+        print("X_test range: (" + str(np.min(data[0]))+","+str(np.max(data[0]))+")")
+        inputs, targets = generate_data(data, samples=10000, targeted=False, start=0, inception=False)
+        print("inputs[0] shape: " + str(inputs[0].shape))
+        print("targets[0] shape: " + str(targets[0].shape))
+        timestart = time.time()
+        adv = attack.attack(inputs, targets)
+        timeend = time.time()
+        distortion = (adv - inputs)**2
+        sorted_distortion = np.sort(distortion)
+        attacked_predictions = model.model.predict(adv)
+        print("Took",timeend-timestart,"seconds to run",len(inputs),"samples.")
+
+
+    return data_dict, test_prediction_array, dr_alg, X_test, input_var, target_var, sorted_distortion, attacked_predictions
+#------------------------------------------------------------------------------#
+
 
 
 def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
@@ -386,7 +439,207 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         import tensorflow.compat.v1 as tf
         import time
         from l2_attack import CarliniL2
-        tf.compat.v1.disable_eager_execution()
+        #tf.compat.v1.disable_eager_execution()
+
+
+
+        model = Sequential()
+        model.add(Conv2D(32, (5, 5),padding = "same",
+                         input_shape=(28,28, 1)))
+
+        #after this we should have input volume of size 24x24
+        model.add(Activation('relu'))
+        model.add(Conv2D(32, (5, 5),padding = "same"))
+        model.add(Activation('relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Conv2D(64, (5, 5),padding = "same"))
+        model.add(Activation('relu'))
+        model.add(Conv2D(64, (5, 5),padding = "same"))
+        model.add(Activation('relu'))
+        model.add(Flatten(MaxPooling2D(pool_size=(2, 2))))
+        model.add(Dense(200))
+        model.add(Activation('relu'))
+        model.add(Dense(200))
+        model.add(Activation('relu'))
+        model.add(Dense(10))
+
+        print("output: " +str(model.summary()))
+        print("last layer output: " + str(model.layers[len(model.layers)-1].output))
+
+        print(type(param_values))
+        new_weights=[]
+      
+        for i in range(len(param_values)):
+            #print("param value shape: " + str(param_values[i].shape))
+            if (len(param_values[i].shape)==4):
+                temp_weight =np.transpose(param_values[i],axes = [2,3,1,0])
+            else: temp_weight = param_values[i]
+            #print("temp weight shape: " + str(temp_weight.shape))
+            new_weights.append(temp_weight)
+
+
+        model.set_weights(new_weights)      
+
+        if rd is not None:
+            A = gradient_transform(model_dict, dr_alg)
+            param_values = [A.T] + param_values
+
+        # model.set_weights(param_values)
+        # m_path = './keras/' + get_model_name(model_dict, rd)
+        # model.save(m_path)
+        # model.load_weights(m_path)
+
+        y_onehot = np.zeros((len(y_test), 10))
+        y_onehot[np.arange(len(y_test)), y_test] = 1
+        # X_test was mean-subtracted before, now we add the mean back
+        ## paul note: why are we subtracting .5 here?
+        ## probably need conditional statement here to handle if rd is not none
+        X_test_mean = (X_test + mean - 0.5).reshape(-1, 784)
+        data = (X_test_mean, y_onehot)
+        # paul note: also probly need conditional here for rd not none
+        mean_flat = mean.reshape(-1, 784)
+
+        # l2-Carlini Attack
+        
+        print("executing eagerly? " + str(tf.executing_eagerly()))
+
+        with tf.Session() as sess:
+            set_session(sess)
+            attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0)
+            #attack = CarliniL0(sess, model, max_iterations=1000, initial_const=10,
+            #                   largest_const=15)
+
+            inputs, targets = generate_data(data, samples=1, targeted=True,
+                                            start=0, inception=False)
+            timestart = time.time()
+            adv = attack.attack(inputs, targets)
+            timeend = time.time()
+            
+            print("Took",timeend-timestart,"seconds to run",len(inputs),"samples.")
+
+            for i in range(len(adv)):
+                print("Valid:")
+                show(inputs[i])
+                print("Adversarial:")
+                show(adv[i])
+                
+                print("Classification:", model.model.predict(adv[i:i+1]))
+
+                print("Total distortion:", np.sum((adv[i]-inputs[i])**2)**.5)
+                # Test overall accuracy of the model
+                pred = model.predict(inputs + 0.5 - mean_flat)
+                correct = 0
+                for i in range(pred.shape[0]):
+                    if np.argmax(pred[i]) == y_test[i]:
+                        correct += 1
+                print('Overall accuracy on test images: ',
+                    correct / float(pred.shape[0]))
+
+                pred = model.predict(adv)
+                correct = 0
+                for i in range(pred.shape[0]):
+                    if np.argmax(pred[i]) == y_test[i]:
+                        correct += 1
+                print('Overall accuracy on adversarial images: ',
+                    correct / float(pred.shape[0]))
+
+                dists_sorted = sorted(dists)
+
+                for i in range(len(dists)):
+                    plotfile.write('{} {} \n'.format(i, dists_sorted[i]))
+
+                # Plot histogram
+                # import matplotlib.pyplot as plt
+                # dists = np.array(dists)
+                # ax.hist(dists, 50, normed=1, histtype='step', cumulative=True,label=str(rd))
+
+
+    elif model_exist_flag == 0:
+        print("model does not exist")
+        # Launch the training loop.
+        print("Starting training...")
+        if layer is not None:
+            model_trainer(input_var, target_var, prediction, test_prediction,
+                          params, model_dict, X_train, y_train, X_val, y_val,
+                          network, layers)
+        else:
+            model_trainer(input_var, target_var, prediction, test_prediction,
+                          params, model_dict, X_train, y_train, X_val, y_val,
+                          network)
+        model_saver(network, model_dict, rd)
+
+    # Evaluating on retrained inputs
+    test_model_eval(model_dict, input_var, target_var, test_prediction, X_test, y_test, rd)
+
+def model_setup_carlini2(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
+                        y_val, mean, ax=None, layer=None):
+    """
+    Main function to set up network (create, load, test, save)
+    """
+
+    rev = model_dict['rev']
+    dim_red = model_dict['dim_red']
+    if rd != None:
+        # Doing dimensionality reduction on dataset
+        print("Doing {} with rd={} over the training data".format(dim_red, rd))
+        X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev)
+    else:
+        dr_alg = None
+    mean = np.mean(X_train, axis=0)
+    
+    print("mean: " + str(mean.shape))
+    print("X_test.shape: " + str(X_test.shape))
+    # Getting data parameters after dimensionality reduction
+    data_dict = get_data_shape(X_train, X_test, X_val)
+    no_of_dim = data_dict['no_of_dim']
+    # Prepare Theano variables for inputs and targets
+    if no_of_dim == 2:
+        input_var = T.tensor('inputs')
+    elif no_of_dim == 3:
+        input_var = T.tensor3('inputs')
+    elif no_of_dim == 4:
+        input_var = T.tensor4('inputs')
+    target_var = T.ivector('targets')
+
+    # Check if model already exists
+    if layer is not None:
+        network, model_exist_flag, layers = model_creator(model_dict, data_dict,
+                                            input_var, target_var, rd, layer)
+    else:
+        network, model_exist_flag = model_creator(model_dict, data_dict,
+                                    input_var, target_var, rd, layer)
+
+    # Defining symbolic variable for network output
+    prediction = lasagne.layers.get_output(network)
+    # Defining symbolic variable for network parameters
+    params = lasagne.layers.get_all_params(network, trainable=True)
+    # Defining symbolic variable for network output with dropout disabled
+    test_prediction = lasagne.layers.get_output(network, deterministic=True)
+
+    # Building or loading model depending on existence
+    if model_exist_flag == 1:
+        print("model exists")
+        # Load the correct model:
+        param_values = model_loader(model_dict, rd)
+
+
+        print("param values shape: " + str(len(param_values)))
+        for i in range(len(param_values)):
+            print("param values["+str(i)+"] shape: " + str(len(param_values[i])))
+
+
+        #lasagne.layers.set_all_param_values(network, param_values)
+
+        # Create Keras model
+        from tensorflow.compat.v1.keras.models import Sequential
+        from tensorflow.compat.v1.keras.layers import Dense, Dropout, Activation, Flatten
+        from tensorflow.compat.v1.keras.layers import Conv2D, MaxPooling2D
+        from tensorflow.compat.v1.keras.backend import set_session
+
+        import tensorflow.compat.v1 as tf
+        import time
+        from l2_attack import CarliniL2
+        #tf.compat.v1.disable_eager_execution()
 
 
 

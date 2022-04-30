@@ -109,6 +109,7 @@ class CarliniL2:
         start_vars = set(x.name for x in tf.global_variables())
         optimizer = tf.train.AdamOptimizer(self.LEARNING_RATE)
         self.train = optimizer.minimize(self.loss, var_list=[modifier])
+        print("self.train : " + str(self.train))
         end_vars = tf.global_variables()
         new_vars = [x for x in end_vars if x.name not in start_vars]
 
@@ -126,6 +127,8 @@ class CarliniL2:
         If self.targeted is true, then the targets represents the target labels.
         If self.targeted is false, then targets are the original class labels.
         """
+        print("IMAGE DIMENSIONS: " + str(imgs.shape) + ", target dimensions: " +str(targets.shape))
+        #print("image 1: " + str(imgs[0]))
         r = []
         print('go up to',len(imgs))
         for i in range(0,len(imgs),self.batch_size):
@@ -137,6 +140,7 @@ class CarliniL2:
         """
         Run the attack on a batch of images and labels.
         """
+        print("imgs[0]==imgs[1]?: " + str(np.array_equal(imgs[0],imgs[1])))
         def compare(x,y):
             if not isinstance(x, (float, int, np.int64)):
                 x = np.copy(x)
@@ -166,6 +170,7 @@ class CarliniL2:
         o_bestattack = [np.zeros(imgs[0].shape)]*batch_size
         
         for outer_step in range(self.BINARY_SEARCH_STEPS):
+            print("hello")
             print(o_bestl2)
             # completely reset adam's internal state.
             self.sess.run(self.init)
@@ -190,16 +195,20 @@ class CarliniL2:
                 _, l, l2s, scores, nimg = self.sess.run([self.train, self.loss, 
                                                          self.l2dist, self.output, 
                                                          self.newimg])
-
+                # if (iteration ==0): 
+                #     print("scores: " + str(scores))
+                #     print("l2s: " + str(l2s))
+                #     print("nimg: " + str(nimg))
                 if np.all(scores>=-.0001) and np.all(scores <= 1.0001):
+                    print("RED FLAG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                     if np.allclose(np.sum(scores,axis=1), 1.0, atol=1e-3):
                         if not self.I_KNOW_WHAT_I_AM_DOING_AND_WANT_TO_OVERRIDE_THE_PRESOFTMAX_CHECK:
                             raise Exception("The output of model.predict should return the pre-softmax layer. It looks like you are returning the probability vector (post-softmax). If you are sure you want to do that, set attack.I_KNOW_WHAT_I_AM_DOING_AND_WANT_TO_OVERRIDE_THE_PRESOFTMAX_CHECK = True")
                 
                 # print out the losses every 10%
                 if iteration%(self.MAX_ITERATIONS//10) == 0:
+                    #print(iteration,self.sess.run((self.train,self.l2dist,self.output)))
                     print(iteration,self.sess.run((self.loss,self.loss1,self.loss2)))
-
                 # check if we should abort search if we're getting nowhere.
                 if self.ABORT_EARLY and iteration%(self.MAX_ITERATIONS//10) == 0:
                     if l > prev*.9999:
