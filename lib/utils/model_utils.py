@@ -297,14 +297,16 @@ def model_setup_keras(model_dict, X_train, y_train, X_test, y_test, X_val, y_val
     data_dict = get_data_shape(X_train, X_test, X_val)
     no_of_dim = data_dict['no_of_dim']
 
-    # Prepare Theano variables for inputs and targets
-    if no_of_dim == 2:
-        input_var = T.matrix('inputs')
-    elif no_of_dim == 3:
-        input_var = T.tensor3('inputs')
-    elif no_of_dim == 4:
-        input_var = T.tensor4('inputs')
-    target_var = T.ivector('targets')
+    # this should disappear because we don't want to use theano 
+    # anymore. I am just keeping it here as a reference.
+    # # Prepare Theano variables for inputs and targets
+    # if no_of_dim == 2:
+    #     input_var = T.matrix('inputs')
+    # elif no_of_dim == 3:
+    #     input_var = T.tensor3('inputs')
+    # elif no_of_dim == 4:
+    #     input_var = T.tensor4('inputs')
+    # target_var = T.ivector('targets')
 
     # X_test was mean-subtracted before, now we add the mean back
     ## paul note: why are we subtracting .5 here?
@@ -321,7 +323,6 @@ def model_setup_keras(model_dict, X_train, y_train, X_test, y_test, X_val, y_val
     import time
 
     with tf.Session() as sess:
-        tf.enable_eager_execution()
         print("executing eagerly? " + str(tf.executing_eagerly()))
 
         model =  MNISTModel("models/mnist", sess)
@@ -370,7 +371,7 @@ def model_setup_keras(model_dict, X_train, y_train, X_test, y_test, X_val, y_val
         print("Took",timeend-timestart,"seconds to run",len(inputs),"samples.")
 
 
-    return data_dict, test_prediction_array, dr_alg, X_test, input_var, target_var, sorted_distortion, attacked_predictions
+    return data_dict, test_prediction_array, dr_alg, X_test, sorted_distortion, attacked_predictions
 #------------------------------------------------------------------------------#
 
 

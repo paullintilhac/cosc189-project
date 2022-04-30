@@ -71,6 +71,26 @@ if __name__ == "__main__":
         y_onehot = np.zeros((len(y_test), 10))
         y_onehot[np.arange(len(y_test)), y_test] = 1
         
+        # Defining symbolic variable for network output
+        test_prediction = model.predict(X_test)
+
+        # max_index_col = np.argmax(test_prediction, axis=0)
+        # print("max_index_col shape: " + str(max_index_col.shape))
+
+        test_prediction_array = tf.math.argmax(test_prediction,axis=1).eval()
+
+        print("executing eagerly? " + str(tf.executing_eagerly()))
+
+        print("prediction shape: " + str(test_prediction.shape))        
+        print("y_test_shape: " + str(y_test.shape))
+        print("first prediction: " + str(test_prediction[0].eval()))
+        print("first label: " + str(y_test[0]))
+        print("test_prediction_array shape:  " + str(test_prediction_array.shape))
+        print("test_prediction_array[0]: " + str(test_prediction_array[0]))
+
+        accuracy = np.mean(test_prediction_array == y_test)
+        print("unattacked test accuracy: " + str(accuracy))
+
         data = (X_test, y_onehot)
 
         #data, model =  CIFAR(), CIFARModel("models/cifar", sess)
@@ -78,21 +98,17 @@ if __name__ == "__main__":
         #attack = CarliniL0(sess, model, max_iterations=1000, initial_const=10,
         #                   largest_const=15)
 
-        inputs, targets = generate_data(data, samples=1, targeted=True,
+        inputs, targets = generate_data(data, samples=1, targeted=False,
                                         start=0, inception=False)
         print("shape of inputs: " + str(inputs.shape) + ", shape of targets: " + str(targets.shape))
         timestart = time.time()
         adv = attack.attack(inputs, targets)
         timeend = time.time()
         
-        print("Took",timeend-timestart,"seconds to run",len(inputs),"samples.")
+        distortion = (adv - inputs)**2
+        sorted_distortion = np.sort(distortion)
+        attacked_predictions = model.model.predict(adv)
+        attacked_prediction_array = tf.math.argmax(attacked_predictions,axis=1).eval()
 
-        for i in range(len(adv)):
-            print("Valid:")
-            show(inputs[i])
-            print("Adversarial:")
-            show(adv[i])
-            
-            print("Classification:", model.model.predict(adv[i:i+1]))
-
-            print("Total distortion:", np.sum((adv[i]-inputs[i])**2)**.5)
+        attacked_accuracy = np.mean(attacked_prediction_array == y_test)
+        print("attacked_accuracy: " + str(attacked_accuracy))

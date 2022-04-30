@@ -59,7 +59,8 @@ def main(argv):
     print("X_test shape: " + str(X_test.shape))
     print("X_test[0] == X_test[1]? " + str(np.array_equal(X_test[0],X_test[1])))
     print("running model setup")
-    data_dict, test_prediction, dr_alg, X_test, input_var, target_var, sorted_distortions, attacked_predictions = \
+
+    data_dict, test_prediction, dr_alg, X_test, sorted_distortions, attacked_predictions = \
         model_setup_keras(model_dict, X_train, y_train, X_test, y_test, X_val, y_val)
 
 
