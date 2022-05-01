@@ -50,7 +50,7 @@ def main(argv):
 
         X_test_transpose = np.transpose(X_test,axes = [0,2,3,1])-.5
 
-        print(" first image shape: " + str(X_test[0].shape))
+        print(" first image shape: " + str(X_test_transpose[0].shape))
         print(" min: " + str(np.min(X_test_transpose[0])))
         print(" max: " + str(np.max(X_test_transpose[0])))
         y_onehot = np.zeros((len(y_test), 10))
@@ -125,8 +125,8 @@ def main(argv):
 
         print("X_test_t.shape: " + str(X_test_t.shape))
         print(" first image shape: " + str(X_test_t[0].shape))
-        print(" min: " + str(np.min(X_test_t[0])-.5))
-        print(" max: " + str(np.max(X_test_t[0])-.5))
+        print(" min: " + str(np.min(X_test_t[0])))
+        print(" max: " + str(np.max(X_test_t[0])))
         data = Object()
         data.train_data = np.transpose(X_train_t,axes = [0,2,3,1])-.5
         data.train_labels = y_train
