@@ -121,21 +121,22 @@ def main(argv):
         class Object(object):
             pass
         
-        X_test_t = np.transpose(X_test,axes = [0,2,3,1])-.5
+        X_test_t = np.transpose(X_test_t,axes = [0,2,3,1])-.5
 
         print("X_test_t.shape: " + str(X_test_t.shape))
         print(" first image shape: " + str(X_test_t[0].shape))
         print(" min: " + str(np.min(X_test_t[0])))
         print(" max: " + str(np.max(X_test_t[0])))
-        data = Object()
-        data.train_data = np.transpose(X_train_t,axes = [0,2,3,1])-.5
-        data.train_labels = y_train
-        data.validation_data = np.transpose(X_val_t,axes = [0,2,3,1])-.5
-        data.validation_labels = y_val
+        
         # re-train model on transformed data
         # this needs to be cleaned up /refactored so that it is using automatic naming conventions like before, 
         # and checking to see if model already exists, etc. 
-        #train(data, "models/retrain",[32, 32, 64, 64, 200, 200] , num_epochs=5)
+        # data = Object()
+        # data.train_data = np.transpose(X_train_t,axes = [0,2,3,1])-.5
+        # data.train_labels = y_train
+        # data.validation_data = np.transpose(X_val_t,axes = [0,2,3,1])-.5
+        # data.validation_labels = y_val
+        # train(data, "models/retrain",[32, 32, 64, 64, 200, 200] , num_epochs=5)
 
         # once we have trained model, we load it
         defended_model =  MNISTModel("models/retrain", sess)
@@ -149,7 +150,7 @@ def main(argv):
         test_prediction_defended_unattacked_array = tf.math.argmax(test_prediction_defended_unattacked,axis=1).eval()
 
         defended_unattacked_accuracy = np.mean(test_prediction_defended_unattacked_array == y_test)
-        print("defended, unattacked test accuracy: " + str(accuracy))
+        print("defended, unattacked test accuracy: " + str(defended_unattacked_accuracy))
 
         defended_data = (X_test_t, y_onehot)
 
