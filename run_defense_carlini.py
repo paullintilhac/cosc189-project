@@ -48,16 +48,16 @@ def main(argv):
         no_of_dim = data_dict['no_of_dim']
 
 
-        X_test = np.transpose(X_test,axes = [0,2,3,1])-.5
+        X_test_transpose = np.transpose(X_test,axes = [0,2,3,1])-.5
 
         print(" first image shape: " + str(X_test[0].shape))
-        print(" min: " + str(np.min(X_test[0])))
-        print(" max: " + str(np.max(X_test[0])))
+        print(" min: " + str(np.min(X_test_transpose[0])))
+        print(" max: " + str(np.max(X_test_transpose[0])))
         y_onehot = np.zeros((len(y_test), 10))
         y_onehot[np.arange(len(y_test)), y_test] = 1
         
         # Defining symbolic variable for network output
-        test_prediction = model.predict(X_test)
+        test_prediction = model.predict(X_test_transpose)
 
         # max_index_col = np.argmax(test_prediction, axis=0)
         # print("max_index_col shape: " + str(max_index_col.shape))
@@ -76,7 +76,7 @@ def main(argv):
         accuracy = np.mean(test_prediction_array == y_test)
         print("undefended, unattacked test accuracy: " + str(accuracy))
 
-        data = (X_test, y_onehot)
+        data = (X_test_transpose, y_onehot)
 
         #data, model =  CIFAR(), CIFARModel("models/cifar", sess)
         attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0, targeted=False)
@@ -116,26 +116,29 @@ def main(argv):
 
         #run dimension reduction
         X_train_t, X_test_t, X_val_t, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small, gamma, kernel)
-        print("X_test_t.shape: " + str(X_test_t.shape))
-        print(" first image shape: " + str(X_test_t[0].shape))
-        print(" min: " + str(np.min(X_test_t[0])))
-        print(" max: " + str(np.max(X_test_t[0])))
+        
 
         class Object(object):
             pass
+        
+        X_test_t = np.transpose(X_test,axes = [0,2,3,1])-.5
 
+        print("X_test_t.shape: " + str(X_test_t.shape))
+        print(" first image shape: " + str(X_test_t[0].shape))
+        print(" min: " + str(np.min(X_test_t[0])-.5))
+        print(" max: " + str(np.max(X_test_t[0])-.5))
         data = Object()
-        data.train_data = X_train_t
+        data.train_data = np.transpose(X_train_t,axes = [0,2,3,1])-.5
         data.train_labels = y_train
-        data.validation_data = X_val_t
+        data.validation_data = np.transpose(X_val_t,axes = [0,2,3,1])-.5
         data.validation_labels = y_val
         # re-train model on transformed data
         # this needs to be cleaned up /refactored so that it is using automatic naming conventions like before, 
         # and checking to see if model already exists, etc. 
-        train(data, "models/mnist/retrain",[32, 32, 64, 64, 200, 200] , num_epochs=5)
+        #train(data, "models/retrain",[32, 32, 64, 64, 200, 200] , num_epochs=5)
 
         # once we have trained model, we load it
-        defended_model =  MNISTModel("models/mnist", sess)
+        defended_model =  MNISTModel("models/retrain", sess)
 
         # run prediction on defended, un-attacked model
         test_prediction_defended_unattacked = defended_model.predict(X_test_t)
@@ -156,8 +159,8 @@ def main(argv):
         defended_inputs, defended_targets = generate_data(defended_data, samples=9, targeted=False,
                                         start=0, inception=False)
 
-        print("shape of inputs: " + str(defended_inputs.shape) + ", shape of targets: " + str(defended_targets.shape))
-        #print("targets: " + str(targets))
+        print("shape of defended inputs: " + str(defended_inputs.shape) + ", shape of defended targets: " + str(defended_targets.shape))
+        print("targets: " + str(defended_targets))
 
         timestart = time.time()
         defended_adv = white_box_attack.attack(defended_inputs, defended_targets)
