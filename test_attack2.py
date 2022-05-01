@@ -5,7 +5,9 @@ from setup_mnist import MNIST, MNISTModel
 from lib.utils.data_utils import *
 from l2_attack import CarliniL2
 import csv
-
+from lib.attacks.nn_attacks import *
+from lib.defenses.nn_defenses import *
+from lib.utils.data_utils import *
 
 
 def generate_data(data, samples, targeted=True, start=0, inception=False):
@@ -134,9 +136,9 @@ if __name__ == "__main__":
             for i in range(len(sorted_distortion)):
                 spamwriter.writerow([i]  + [sorted_distortion[i]])
 
-        if rd:
-            # Doing dimensionality reduction on dataset
-            print("Doing {} with rd={} over the training data".format(dim_red, rd))
-            X_train, X_test, X_val, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small, gamma, kernel)
-        else:
-            dr_alg = None
+        
+        X_train_t, X_test_t, X_val_t, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small, gamma, kernel)
+        print("X_test_t.shape: " + str(X_test_t.shape))
+        print(" first image shape: " + str(X_test_t[0].shape))
+        print(" min: " + str(np.min(X_test_t[0])))
+        print(" max: " + str(np.max(X_test_t[0])))

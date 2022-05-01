@@ -168,7 +168,6 @@ class CarliniL2:
         o_bestattack = [np.zeros(imgs[0].shape)]*batch_size
         
         for outer_step in range(self.BINARY_SEARCH_STEPS):
-            print("hello")
             print(o_bestl2)
             # completely reset adam's internal state.
             self.sess.run(self.init)
