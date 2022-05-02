@@ -131,12 +131,23 @@ def main(argv):
         # re-train model on transformed data
         # this needs to be cleaned up /refactored so that it is using automatic naming conventions like before, 
         # and checking to see if model already exists, etc. 
-        # data = Object()
-        # data.train_data = np.transpose(X_train_t,axes = [0,2,3,1])-.5
-        # data.train_labels = y_train
-        # data.validation_data = np.transpose(X_val_t,axes = [0,2,3,1])-.5
-        # data.validation_labels = y_val
-        # train(data, "models/retrain",[32, 32, 64, 64, 200, 200] , num_epochs=5)
+
+        y_train_onehot = np.zeros((len(y_train), 10))
+        y_train_onehot[np.arange(len(y_train)), y_train] = 1
+        y_val_onehot = np.zeros((len(y_val), 10))
+        y_val_onehot[np.arange(len(y_val)), y_val] = 1
+
+        data =  MNIST()
+        data.train_data = np.transpose(X_train_t,axes = [0,2,3,1])-.5
+        data.train_labels = y_train_onehot
+        data.validation_data = np.transpose(X_val_t,axes = [0,2,3,1])-.5
+        data.validation_labels = y_val_onehot
+
+        print("data.train_data shape: " + str(data.train_data.shape))
+        print("data.train_labels shape: " + str(data.train_labels.shape))
+        print("data.val_data shape: " + str(data.validation_data.shape))
+        print("data.val_labels shape: " + str(data.validation_labels.shape))
+        train(data, "models/retrain",[32, 32, 64, 64, 200, 200] , num_epochs=50)
 
         # once we have trained model, we load it
         defended_model =  MNISTModel("models/retrain", sess)
@@ -144,6 +155,7 @@ def main(argv):
         # run prediction on defended, un-attacked model
         test_prediction_defended_unattacked = defended_model.predict(X_test_t)
 
+        # print("test_prediction_defended_unattacked: " + str(test_prediction_defended_unattacked.eval()[:10]))
         # max_index_col = np.argmax(test_prediction, axis=0)
         # print("max_index_col shape: " + str(max_index_col.shape))
 
@@ -178,7 +190,7 @@ def main(argv):
         defended_attacked_max_distortion = np.max(defended_attacked_distortion)
         defended_attacked_mean_distortion = np.mean(defended_attacked_distortion)
         print("defended, attacked accuracy: " + str(defended_attacked_accuracy))
-        print("max distortion: " + str(defneded_attacked_max_distortion))
+        print("max distortion: " + str(defended_attacked_max_distortion))
         print("mean distortion: " + str(defended_attacked_mean_distortion))
 
         with open('defended_sorted_distortions.csv', 'w', newline='') as csvfile:

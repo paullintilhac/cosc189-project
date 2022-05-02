@@ -63,7 +63,9 @@ if __name__ == "__main__":
     with tf.Session() as sess:
         data, model =  MNIST(), MNISTModel("models/mnist", sess)
         test_data = data.test_data
-        print("first image shape: " + str(test_data[0].shape))
+        print("data: " + str(data))
+        print("data attributes: " + str(dir(data)))
+        print(" first image shape: " + str(test_data[0].shape))
         print(" min: " + str(np.min(test_data[0])))
         print(" max: " + str(np.max(test_data[0])))
         #data, model =  CIFAR(), CIFARModel("models/cifar", sess)
@@ -74,6 +76,8 @@ if __name__ == "__main__":
         inputs, targets = generate_data(data, samples=1, targeted=True,
                                         start=0, inception=False)
         print("shape of inputs: " + str(inputs.shape) + ", shape of targets: " + str(targets.shape))
+
+        print("targets: " + str(targets))
         timestart = time.time()
         adv = attack.attack(inputs, targets)
         timeend = time.time()
