@@ -92,7 +92,6 @@ class MNISTModel:
         model.add(Dense(10))
         model.load_weights(restore)
 
-        print("model summary" + str(model.summary()))
         self.model = model
 
     def predict(self, data):

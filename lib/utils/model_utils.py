@@ -468,9 +468,7 @@ def model_setup_carlini(rd, model_dict, X_train, y_train, X_test, y_test, X_val,
         model.add(Activation('relu'))
         model.add(Dense(10))
 
-        print("output: " +str(model.summary()))
-        print("last layer output: " + str(model.layers[len(model.layers)-1].output))
-
+        
         print(type(param_values))
         new_weights=[]
       
@@ -668,8 +666,6 @@ def model_setup_carlini2(rd, model_dict, X_train, y_train, X_test, y_test, X_val
         model.add(Activation('relu'))
         model.add(Dense(10))
 
-        print("output: " +str(model.summary()))
-        print("last layer output: " + str(model.layers[len(model.layers)-1].output))
 
         print(type(param_values))
         new_weights=[]

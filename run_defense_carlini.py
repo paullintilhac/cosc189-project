@@ -85,6 +85,8 @@ def main(argv):
 
         inputs, targets = generate_data(data, samples=9, targeted=False,
                                         start=0, inception=False)
+        
+        print("sum of inputs: " + str(np.sum(inputs)) + ", sum of  targets: " + str(np.sum(targets)))
         print("inputs shape: " + str(inputs.shape) + ", targets shape: " + str(targets.shape))
 
         print("inputs min: " + str(np.min(inputs[0])))
@@ -115,7 +117,6 @@ def main(argv):
             for i in range(len(sorted_distortion)):
                 spamwriter.writerow([i]  + [sorted_distortion[i]])
 
-    with tf.Session() as sess2:
         #run dimension reduction
         X_train_t, X_test_t, X_val_t, dr_alg = dr_wrapper(X_train, X_test, X_val, dim_red, rd, y_train, rev,small, gamma, kernel)
         
@@ -149,7 +150,7 @@ def main(argv):
         # train(data, "models/retrain",[32, 32, 64, 64, 200, 200] , num_epochs=50)
 
         # once we have trained model, we load it
-        defended_model =  MNISTModel("models/retrain", sess2)
+        defended_model =  MNISTModel("models/retrain", sess)
 
         # run prediction on defended, un-attacked model
         test_prediction_defended_unattacked = defended_model.predict(X_test_t)
@@ -166,18 +167,36 @@ def main(argv):
         defended_data = (X_test_t, y_onehot)
 
         #data, model =  CIFAR(), CIFARModel("models/cifar", sess)
-        white_box_attack = CarliniL2(sess2, defended_model, batch_size=9, max_iterations=1000, confidence=0, targeted=False)
+        white_box_attack = CarliniL2(sess, defended_model, batch_size=9, max_iterations=1000, confidence=0, targeted=False)
 
         defended_inputs, defended_targets = generate_data(defended_data, samples=9, targeted=False,
                                         start=0, inception=False)
 
-        print("shape of defended inputs: " + str(defended_inputs.shape) + ", shape of defended targets: " + str(defended_targets.shape))
+        # this shouldn't be a simple clip, but should be tanh'ing the image 
+        # to be between min and max. need to update
+        defended_inputs = np.clip(defended_inputs,-.5,.5)
+        
+        
+        diffInd = np.where(defended_inputs!=inputs)
+        diffInputs = inputs[diffInd]
+        diffDefInputs = defended_inputs[diffInd]
 
+        print("length of diffInd: " + str(diffInd))
+        print("type of inputs[0]: " + str(type(inputs[0][0])) + ", type of defended iputs[0]: " + str(type(defended_inputs[0][0])))
+        print("diffInputs: " + str(diffInputs))
+        print("diffDefInputs: " + str(diffDefInputs))
+        print("defended input same as input? " + str(np.array_equal(inputs,defended_inputs)))
+        print("defended target same as target? " + str(np.array_equal(targets,defended_targets)))
+
+        print("sum of defended inputs: " + str(np.sum(defended_inputs)) + ", sum of defended targets: " + str(np.sum(defended_targets)))
+
+        print("shape of defended inputs: " + str(defended_inputs.shape) + ", shape of defended targets: " + str(defended_targets.shape))
+        
         print("defended inputs min: " + str(np.min(defended_inputs[0])))
         print("defended inputs max: " + str(np.max(defended_inputs[0])))
 
         timestart = time.time()
-        defended_adv = white_box_attack.attack(defended_inputs, defended_targets)
+        defended_adv = white_box_attack.attack(defended_inputs, targets)
         timeend = time.time()
         
         defended_attacked_distortion = np.sum((defended_adv - defended_inputs)**2,axis=(1,2,3))**.5
