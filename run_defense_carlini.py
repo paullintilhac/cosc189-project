@@ -160,7 +160,7 @@ def main(argv):
         # print("data.train_labels shape: " + str(data.train_labels.shape))
         # print("data.val_data shape: " + str(data.validation_data.shape))
         # print("data.val_labels shape: " + str(data.validation_labels.shape))
-        train(data, "models/retrain-kpca-100-corrected",[32, 32, 64, 64, 200, 200] , num_epochs=5)
+        train(data, "models/retrain-kpca-100-corrected",[32, 32, 64, 64, 200, 200] , num_epochs=50)
 
         # once we have trained model, we load it
         defended_model =  MNISTModel("models/retrain-kpca-100-corrected", sess)
