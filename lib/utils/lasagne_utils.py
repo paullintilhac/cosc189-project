@@ -228,11 +228,12 @@ def build_cnn_rd(input_var, rd):
     Papernot et. al. (2016), but modified to be used with dimension reduced
     data.
     """
-
+    print("input var: " + str(input_var))
+    print("rd: " + str(rd))
     # Input layer, as usual:
     network = lasagne.layers.InputLayer(shape=(None, 1, rd),
                                         input_var=input_var)
-
+    
     # 2 Convolutional layers with 32 kernels of size 5x5.
     network = lasagne.layers.Conv1DLayer(
         network, num_filters=32, filter_size=5,
@@ -274,6 +275,7 @@ def build_cnn_rd(input_var, rd):
 # hidden layers in front of the output layer.
 def build_cnn(in_shape, n_out, input_var=None):
     # Input layer, as usual:
+    print("in_shape: " + str(in_shape))
     network = lasagne.layers.InputLayer(shape=in_shape, input_var=input_var)
 
     # 2 Convolutional layers with 32 kernels of size 5x5.

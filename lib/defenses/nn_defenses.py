@@ -87,11 +87,17 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
     """
     print("running retrain_defense")
     # Parameters
-    rev_flag = None
-    
+    rev_flag = model_dict['rev']
+    dim_red = model_dict['dim_red']
+
     data_dict, test_prediction, dr_alg, X_test, input_var, target_var = \
         model_setup(model_dict, X_train, y_train, X_test, y_test, X_val, y_val,
                     rd)
+    print("in retrain defense")
+    print("X_train shape: " + str(X_train.shape))
+    print("x_test shape: " + str(X_test.shape))
+    print("X_Val shape: " + str(X_val.shape))
+
     print("dr_alg in retrain defense:  " + str(dr_alg))
     print("model dict in retrain defense: " + str(model_dict))
     validator, indexer, predictor, confidence = local_fns(input_var, target_var,
@@ -102,17 +108,26 @@ def retrain_defense(model_dict, dev_list, adv_x_ini, rd, X_train, y_train,
 
     adv_len = len(adv_x_ini)
     dev_len = len(dev_list)
-    adv_x = np.zeros((adv_len, rd, dev_len))
+    adv_dim = rd
+    if rev_flag:
+        adv_dim = 784
+    adv_x = np.zeros((adv_len, adv_dim, dev_len))
     output_list = []
     for mag_count in range(dev_len):
         X_adv = dr_alg.transform(adv_x_ini[:,:,mag_count])
-        adv_x[:,:,mag_count] = X_adv
-        X_adv = reshape_data(X_adv, data_dict, rd)
 
-        output_list.append(acc_calc_all(X_adv, y_test, X_test, i_c, validator, indexer, predictor, confidence))
-        err, acc = validator(X_adv, y_test)
-        print("real test accurcy: " + str(acc))
-        print("Final results for {}:".format(dev_list[mag_count]))
+        if rev_flag:
+            X_adv_rev = invert_dr(X_adv, dr_alg, dim_red)
+            adv_x[:,:,mag_count] = X_adv_rev
+            X_adv_rev = reshape_data(X_adv_rev, data_dict, rd, rev=rev_flag)
+            output_list.append(acc_calc_all(X_adv_rev, y_test, X_test, i_c, validator, indexer, predictor, confidence))
+        else:
+            adv_x[:,:,mag_count] = X_adv
+            X_adv = reshape_data(X_adv, data_dict, rd)
+            output_list.append(acc_calc_all(X_adv, y_test, X_test, i_c, validator, indexer, predictor, confidence))
+
+        print("X_adv_rev shape: " + str(X_adv_rev.shape))
+        print("output_list: " + str(output_list))
         print("  test accuracy:\t\t{:.2f} %".format(100.0-output_list[0][4]))
 
     # Printing result to file

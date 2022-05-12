@@ -106,7 +106,6 @@ def index_fn(model_predict, input_var, target_var):
 
 def val_fn(input_var, target_var, test_loss, test_acc):
     """Theano function returns total loss and accuracy"""
-
     return theano.function([input_var, target_var], [test_loss, test_acc],
                            allow_input_downcast=True)
 #------------------------------------------------------------------------------#
@@ -199,7 +198,7 @@ def test_model_eval(model_dict, input_var, target_var, test_prediction, X_test,
     printed on a corresponding utility output file saved in nn_output_data
     folder.
     """
-
+    
     test_loss = loss_fn(test_prediction, target_var)
     test_acc = acc_fn(test_prediction, target_var)
     validator = val_fn(input_var, target_var, test_loss, test_acc)

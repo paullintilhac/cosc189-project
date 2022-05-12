@@ -12,7 +12,6 @@ from sklearn import preprocessing
 
 #------------------------------------------------------------------------------#
 
-
 class DCA:
 
     def __init__(self, rho=None, rho_p=None, n_components=None):

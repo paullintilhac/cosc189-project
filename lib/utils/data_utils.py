@@ -35,7 +35,7 @@ def model_dict_create():
                         help='Specify number of epochs for training')
     parser.add_argument('-a', '--attack', default='fg', type=str,
                         help='Specify method to create adversarial samples')
-    parser.add_argument('-d', '--defense', default='recons', type=str,
+    parser.add_argument('-d', '--defense', default=None, type=str,
                         help='Specify defense mechanism')
     parser.add_argument('-dr', '--dim_red', default='pca', type=str,
                         help='Specify dimension reduction scheme')
@@ -60,6 +60,8 @@ def model_dict_create():
                         help='Specify activaton function to use')
     parser.add_argument('--small', action='store_true',
                         help='use only 1/10th of the mnist data')
+    parser.add_argument('--keras',action='store_true',
+                        help='use keras version of model instead of lasagne')
     args = parser.parse_args()
 
     model_dict = {}
@@ -87,6 +89,10 @@ def model_dict_create():
         model_dict.update({'small': 1})
     else:
         model_dict.update({'small': None})
+    if args.keras:
+        model_dict.update({'keras': 1})
+    else:
+        model_dict.update({'keras': None})
 
     # Determine output size
     dataset = model_dict['dataset']
@@ -116,7 +122,7 @@ def get_model_name(model_dict, rd = None):
     small = model_dict['small']
     gamma = model_dict['gamma']
     kernel = model_dict['kernel']
-
+    keras = model_dict['keras']
     if model_name == 'mlp' or model_name == 'custom':
         m_name = 'nn_FC_{}_{}'.format(depth, width)
         if model_dict['nonlin'] != 'sigmoid':
@@ -137,6 +143,8 @@ def get_model_name(model_dict, rd = None):
         m_name += '_g_{}'.format(gamma)
     if small is not None:
         m_name += '_small'
+    if keras is not None:
+        m_name += '_keras'
     if model_name == 'custom':
         m_name += '_drop'
     if kernel is not None:
